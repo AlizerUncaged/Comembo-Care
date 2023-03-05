@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid">
+
+    <div class="container-fluid row m-4">
+        <h1 class="text-center">Our Services</h1>
+    </div>
+    <ul class="list-group bg-grey list-group-flush">
+        @{
+            var services = @"CBC
+FBS
+CREA
+BUA
+CHOLESTEROL
+SGPT
+URINE TEST
+STOOL EXAM
+X RAY BIG
+NEORO-PHYCH".Split(Environment.NewLine).Select(x => x.Trim());
+
+            foreach (var service in services)
+            {
+                <li class="list-group-item bg-grey fw-bold">@service</li>
+            }
+        }
+    </ul>
+
+</div>

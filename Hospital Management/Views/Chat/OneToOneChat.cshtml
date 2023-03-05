@@ -1,0 +1,182 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject UserManager<IdentityUser> UserManager
+@model IdentityUser?
+
+@{
+    // doctor
+
+    Layout = "_Layout";
+
+    // current doctor
+    var currentUser = (await UserManager.GetUserAsync(User));
+
+    var userChats = await DbContext.Chats
+        .Include(x => x.From)
+        .Include(x => x.To)
+        .Where(x => x.From.Id == Model.Id || x.To.Id == Model.Id).ToListAsync();
+
+    var userChatsWithDoctor = userChats.Where(x => x.From.Id == currentUser.Id || x.To.Id == currentUser.Id).ToList();
+
+    var DoctorChats = await DbContext.Chats
+        .Include(x => x.From)
+        .Include(x => x.To).Where(x => x.From.Id == currentUser.Id || x.To.Id == currentUser.Id).ToListAsync();
+
+    var DoctorChatsWithUser = DoctorChats.Where(x => x.From.Id == Model.Id || x.To.Id == Model.Id).ToList();
+
+    var currentChats = DoctorChatsWithUser.Concat(userChatsWithDoctor).Distinct().OrderBy(x => x.SentTime).ToList();
+
+    // var patientChats = await DbContext.Chats.Where(x =>  );
+}
+<style>
+
+::-webkit-scrollbar {
+    width: 0;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+</style>
+@if (Model is {})
+{
+    ViewData["Title"] = $"Chat with {Model.UserName}";
+
+    <div class="container-fluid p-0" style="height: calc(100% - 60px)">
+        <div class="row h-100">
+            <div class="col-12">
+                <div class="card h-100">
+                    <div class="card-header d-flex flex-row align-items-center">
+                        @if (Model is Doctor Doctor)
+                        {
+                            <img style="max-height: 35px; max-width: 35px" class="rounded-3 me-2" src="@Doctor.DoctorImage"/>
+                        }
+                        @if (Model is Patient patient)
+                        {
+                            <img style="max-height: 35px; max-width: 35px" class="rounded-3 me-2" src="@patient.Image"/>
+                        }
+                        <p class="m-0"><strong>@(Model is Doctor ? "Dr." : string.Empty) @Model.UserName</strong> | <span class="text-success">Online</span></p>
+                    </div>
+                    <div class="card-body">
+                        <div class="chat-box h-100" style="overflow-y: scroll; scrollbar-width: none;  -ms-overflow-style: none;" id="messagesList">
+                            @foreach (var chat in currentChats)
+                            {
+                                if (chat.From.Id == currentUser.Id) // Current User Chatted
+                                {
+                                    <div class="d-flex flex-row-reverse bd-highlight mb-3">
+                                        <div class=" bd-highlight border-2 rounded-3 border border-primary p-2">
+                                            <p class="opacity-50">@currentUser.UserName - @DateTime.Now.ToString("f")</p>
+                                            <p class="m-0 p-0 my-auto ms-2">@chat.Content</p>
+                                        </div>
+                                    </div>
+                                }
+                                else // The other person
+                                {
+                                    <div class="d-flex flex-row bd-highlight mb-3">
+                                        <div class=" bd-highlight border-2 rounded-3 border border-primary p-2">
+                                            <p class="opacity-50">@Model.UserName - @DateTime.Now.ToString("f")</p>
+                                            <p class="m-0 p-0 my-auto ms-2">@chat.Content</p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="input-group mb-3">
+                            <input id="messageInput" type="text" class="form-control" placeholder="Type your message here...">
+                            <div class="input-group-append">
+                                <button id="sendButton" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+
+    <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    
+    connection.start().then(function () {
+        document.getElementById("sendButton").disabled = false;
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+    
+    var targetUser = '@(Model.Id)';
+    var currentUser = '@(UserManager.GetUserId(User))';
+    
+    function isEmptyOrSpaces(str){
+        return str === null || str.match(/^ *$/) !== null;
+    }
+
+    connection.on("ReceiveMessage", function (from, user, message) {
+        var msg = message.replace(/&/g, "&").replace(/&/g, ">");
+        console.log(`From: ${from} target: ${targetUser} User: ${user}`)
+        var encodedMsg = msg;
+        let messageHtml = null;
+        if (user === currentUser && from === targetUser)
+        messageHtml = `
+                <div class="d-flex flex-row-reverse bd-highlight mb-3">
+                          <div class=" bd-highlight border-2 rounded-3 border border-primary p-2">
+                            <p class="opacity-50">${currentUser}</p>
+                            <p class="m-0 p-0 my-auto ms-2">${encodedMsg}</p>          
+                            </div>
+                </div>
+        `;
+        else if (from === currentUser && user === targetUser)
+            {
+                 messageHtml = `
+                <div class="d-flex flex-row bd-highlight mb-3">
+                          <div class=" bd-highlight border-2 rounded-3 border border-secondary p-2">
+                                <p class="opacity-50">${targetUser}</p>
+                                <p class="m-0 p-0 my-auto ms-2">${encodedMsg}</p>          
+                         </div>
+                 </div>
+                        `;
+            }
+        if (!isEmptyOrSpaces(messageHtml))
+            document.getElementById("messagesList").innerHTML += messageHtml;
+    });
+    
+    document.getElementById("messageInput").onkeyup = function(ev) {
+      if (ev.keyCode == 13)
+          {
+              document.getElementById('sendButton').click()
+          }
+    };
+    
+    const targetUserId = '@(Model.Id)';
+    const signedInUserId = '@(currentUser.Id)';
+    
+    document.getElementById("sendButton").addEventListener("click", function (event) {
+        var message = document.getElementById("messageInput").value;
+        connection.invoke("SendMessage", targetUserId, currentUser, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+        
+        // Save chat.
+        (async () => {
+            const response = await fetch(`/chat/${targetUserId}?` + new URLSearchParams({
+                message: message
+            }), {
+                method : "POST"
+            })
+       
+            console.log(data)
+        })()
+        
+        event.preventDefault();
+    });
+</script>
+}
+else
+{
+    <p class="text-danger">The patient does not exist!</p>
+}

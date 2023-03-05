@@ -1,0 +1,75 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@using Itenso.TimePeriod
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject ApplicationDbContext DbContext
+
+@{
+    ViewData["Title"] = "Patients";
+
+    var search = string.Empty;
+    if (Context.Request.Query.TryGetValue("find", out var find))
+    {
+        search = find.ToString();
+    }
+
+    var patients = await DbContext.Patients.ToListAsync();
+    patients = patients.Where(x => x.UserName.ToLower().Contains(search.ToLower())).ToList();
+
+}
+
+<div class="container-fluid mt-2">
+    <form method="get">
+        <div class="mb-3">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">
+                        <i class="bi bi-search"></i>
+                    </span>
+                </div>
+                <input value="@search" name="find" type="text" class="form-control" placeholder="Patient Name" aria-label="Patient" aria-describedby="basic-addon1">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search Patient</button>
+            </div>
+        </div>
+    </form>
+    <div class="container row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Image</th>
+                <th scope="col">Email</th>
+                <th scope="col">Age</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var patient in patients)
+            {
+                var services = patient.Appointments.SelectMany(x => x.Services.Split(",")).Distinct();
+                <tr>
+                    <th scope="row">@(patients.IndexOf(patient) + 1)</th>
+                    <td>@patient.Name</td>
+                    <td>
+                        <img style="max-height: 75px" class="img-fluid rounded-3" src="@patient.Image"/>
+                    </td>
+                    <td>@patient.Email</td>
+                    <td class="container d-flex flex-column">
+                      
+                    </td>
+                </tr>
+            }
+            <script>
+            function setModal(text, desc)
+            {
+                document.getElementById('patientId').value = text;
+                document.getElementById('desc').innerText = desc;
+            }
+            </script>
+            </tbody>
+        </table>
+    </div>
+</div>

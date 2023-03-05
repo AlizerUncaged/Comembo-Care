@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Doctor";
+}
+<div class="container-fluid row">
+    
+    <div class="container row">
+        <h3>Available Appointments</h3>
+        @await Html.PartialAsync("AppointmentRequest")
+    </div>
+    <div class="container row">
+        <h3>Patient History</h3>
+        @await Html.PartialAsync("PatientHistory")
+    </div>
+</div>

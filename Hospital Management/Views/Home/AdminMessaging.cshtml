@@ -1,0 +1,62 @@
+﻿<div class="container-fluid row">
+    <div class="row m-0 p-0" style="min-height: 400px">
+        <div class="container-fluid p-2 border-1">
+            <div class="d-flex flex-row">
+                <i class="bi bi-chat-dots-fill me-2"></i>
+                <p class="h-4">
+                    <strong>Support Messages</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container-fluid d-flex align-items-end flex-row">
+                <ul id="messagesList" class="list-group"></ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="container-fluid">
+
+        <div class="input-group mb-3">
+
+            <input type="text" id="messageInput" class="form-control"/>
+            <button type="button" class="btn btn-primary" id="sendButton">
+                <i class="bi bi-send-fill"></i> Send
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    
+    connection.start().then(function () {
+        document.getElementById("sendButton").disabled = false;
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+    
+    connection.on("ReceiveMessage", function (user, message) {
+        var msg = message.replace(/&/g, "&").replace(/&/g, ">");
+        var encodedMsg = user + " says " + msg;
+        
+        var li = document.createElement("li");
+        li.classList.add("list-group-item");
+        li.classList.add("rounded-4");
+        li.classList.add("m-2");
+        li.classList.add("border-1");
+        li.textContent = encodedMsg;
+        document.getElementById("messagesList").appendChild(li);
+    });
+    
+    document.getElementById("sendButton").addEventListener("click", function (event) {
+        var user = '@User.Identity.Name';
+        var message = document.getElementById("messageInput").value;
+        connection.invoke("SendMessage", user, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+        event.preventDefault();
+    });
+</script>

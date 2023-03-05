@@ -1,0 +1,211 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext DbContext
+@inject UserManager<IdentityUser> UserManager
+
+@{
+
+    var currentDoctor = await UserManager.GetUserAsync(User);
+
+    var search = string.Empty;
+    if (Context.Request.Query.TryGetValue("find", out var find))
+    {
+        search = find.ToString();
+    }
+
+    var appointmentModels = new List<AppointmentModel>();
+
+    var appointments = DbContext.Appointments.Include(x => x.Patient).Include(x => x.Doctor);
+    if (search == "review")
+        appointments.Where(x => !x.IsCancelled && x.Doctor == null);
+    if (search == "accepted")
+        appointments.Where(x => x.Doctor != null && x.Doctor.Id == currentDoctor.Id);
+    if (search == "declined")
+    {
+        appointmentModels = await DbContext
+            .Doctors
+            .Include(x => x.DeclinedAppointments)
+            .ThenInclude(x => x.Patient)
+            .Include(x => x.DeclinedAppointments)
+            .ThenInclude(x => x.Patient)
+            .Where(x => x.Id == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            .SelectMany(x => x.DeclinedAppointments).ToListAsync();
+    }
+    else
+        appointmentModels = await appointments.ToListAsync();
+
+    // var patients = await DbContext.Patients.ToListAsync();
+    // patients = patients.Where(x => x.UserName.ToLower().Contains(search.ToLower())).ToList();
+    ViewData["Title"] = "Appointments";
+}
+
+        <div class="container-fluid mt-2">
+            <form method="get">
+                <div class="mb-3">
+                    <div class="input-group mb-3">
+                        <select id="cars" name="find" class="form-select">
+                            <option value="review">In Review</option>
+                            <option value="accepted">Accepted (By You)</option>
+                            <option value="declined">Declined</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Refresh</button>
+                    </div>
+                </div>
+            </form>
+            <div class="container row">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Patient Name</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Appointment Date</th>
+                        <th scope="col">Services</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var appointment in appointmentModels)
+                    {
+                        bool open = true;
+                        var status = "Open";
+                        if (appointment.Doctor is {})
+                        {
+                            open = false;
+                            if (appointment.Doctor.Id == currentDoctor.Id)
+                            {
+                                status = "Ongoing";
+                            }
+                            else
+                            {
+                                status = "Accepted (by someone else)";
+                            }
+                        }
+                        if (appointment.IsDone)
+                        {
+                            status = "Closed";
+                        }
+                        <tr>
+                            <th scope="row">@appointment.AppointmentId</th>
+                            <td>@appointment.Patient.FullName</td>
+                            <td>@appointment.Date?.ToString("hh:mm tt")</td>
+                            <td>@appointment.Date?.ToString("MMMM d, yyyy", new CultureInfo("en-US"))</td>
+                            <td>@appointment.Services</td>
+                            <td>@status</td>
+                            <td>
+                                @if (open)
+                                {
+                                    var modalText = $@"Name: {appointment.Patient.FullName}";
+                                    <a onclick="setModal('@appointment.Patient.FullName', '@appointment.Patient.Address', '@appointment.Patient.Birthdate', '@appointment.Patient.Gender', '@appointment.Patient.CellphoneNumber', '@appointment.Patient.Email', '@appointment.Patient.Guardian', '@appointment.Date.ToString()', '@appointment.Services')" class="btn-primary btn rounded-3 m-1" data-bs-toggle="modal" data-bs-target="#modal">
+                                        <i class="bi bi-eye-fill"></i> View
+                                    </a>
+                                    <a class="btn-success btn rounded-3 m-1" href="/approve/@appointment.AppointmentId">
+                                        <i class="bi bi-hand-thumbs-up-fill"></i> Accept
+                                    </a>
+                                    <a class="btn-danger btn rounded-3 m-1" href="/appointments/edit/@appointment.AppointmentId">
+                                        <i class="bi bi-hand-thumbs-down-fill"></i> Hide
+                                    </a>
+
+                                    if (appointment.Doctor is {} && currentDoctor is {})
+                                        if (appointment.Doctor.Id == currentDoctor.Id)
+                                        {
+                                            <a class="btn-danger btn rounded-3 m-1" href="/appointments/done/@appointment.AppointmentId">
+                                                <i class="bi bi-hand-thumbs-up-fill"></i> Done
+                                            </a>
+                                        }
+                                }
+                                else
+                                {
+                                    <p class="text-primary">Closed</p>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+    function setModal(name, address, birthdate, gender, cell, email, guardian, date, services)
+    {
+        document.getElementById("name").value = name;
+        document.getElementById("address").value = address;
+        document.getElementById("birthdate").value = birthdate;
+        document.getElementById("gender").value = gender;
+        document.getElementById("cell").value = cell;
+        document.getElementById("email").value = email;
+        // document.getElementById("guardian").value = guardian;
+        document.getElementById("date").value = date;
+        document.getElementById("services").value = services;
+    }
+    </script>
+        <!-- Modal -->
+  
+
+
+
+
+
+
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="appointment-title"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid row">
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="name"/>
+                            <label for="name">Name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="address"/>
+                            <label for="address">Address</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="birthdate"/>
+                            <label for="birthdate">Birthdate</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="gender"/>
+                            <label for="gender">Gender</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="cell"/>
+                            <label for="cell">Cellphone #</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="email"/>
+                            <label for="email">Email</label>
+                        </div>
+                        @* <div class="form-floating mb-3"> *@
+                        @*     <input class="form-control" readonly="readonly" id="guardian"/> *@
+                        @*     <label for="guardian">Guardian</label> *@
+                        @* </div> *@
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="date"/>
+                            <label for="date">Date</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" readonly="readonly" id="services"/>
+                            <label for="services">Services</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

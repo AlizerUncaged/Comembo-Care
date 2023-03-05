@@ -1,0 +1,65 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject ApplicationDbContext DbContext
+
+@{
+    ViewData["Title"] = "Patients";
+
+    var search = string.Empty;
+    if (Context.Request.Query.TryGetValue("find", out var find))
+    {
+        search = find.ToString();
+    }
+
+    var Doctors = await DbContext.Doctors.ToListAsync();
+    Doctors = Doctors.Where(x => x.UserName.ToLower().Contains(search.ToLower()) && x.Email != RoleCreation.DoctorEmail).ToList();
+
+}
+
+<div class="container-fluid mt-2">
+    <form method="get">
+        <div class="mb-3">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">
+                        <i class="bi bi-search"></i>
+                    </span>
+                </div>
+                <input value="@search" name="find" type="text" class="form-control" placeholder="Doctor's Name" aria-label="Doctor" aria-describedby="basic-addon1">
+                <button type="submit" class="btn btn-primary">Search Doctors</button>
+            </div>
+        </div>
+    </form>
+    <div class="container row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Image</th>
+                <th scope="col">Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Birthdate</th>
+                <th scope="col">License Number</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var doctor in Doctors)
+            {
+                <tr>
+                    <th scope="row">@(Doctors.IndexOf(doctor) + 1)</th>
+                    <td>
+                        <img style="max-height: 100px" class="img-fluid" src="@doctor.DoctorImage"/>
+                    </td>
+                    <td>@doctor.Name</td>
+                    <td>@doctor.Address</td>
+                    <td>@DateTime.Parse(doctor.Birthdate).ToString("MMMM d, yyyy", new CultureInfo("en-US"))</td>
+                    <td>@doctor.LicenseNumber</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,253 @@
+﻿@inject ApplicationDbContext DbContext
+
+@using Hospital_Management.Data
+@using Hospital_Management.Utilities
+@model AppointmentModel?
+
+@{
+    ViewData["Title"] = "Appointment";
+
+    var textBoxClasses = new Dictionary<string, object>()
+    {
+        { "class", "form-control" },
+        { "readonly", "readonly" },
+    };
+}
+@if (Model is {})
+{
+    <form method="post" class="container-fluid m-4" action="/patients/edit" enctype="multipart/form-data">
+        <h4>Invoice Appointment</h4>
+        <p>Current active appointment created at @Model.DateCreated, from patient @Model.Patient.FullName with message:</p>
+        <div class="container-fluid row">
+            <textarea readonly="readonly" class="form-control m-2">@(string.IsNullOrWhiteSpace(Model.Note) ? "<None>" : Model.Note)</textarea>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.Id, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.Id)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.Name, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.Name)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.Address, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.Address)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.CellphoneNumber, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.CellphoneNumber)
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.ExpiresAt, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.ExpiresAt)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Date, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Date)
+                </div>
+            </div>
+        </div>
+        <div class="container row">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newservicemodal"><i class="bi bi-plus-lg"></i> Add Service</button>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Service</th>
+                    <th scope="col">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    var services = Model.Services.Split(",").ToList();
+                    foreach (var appointment in services)
+                    {
+                        var appointmentSplitted = appointment.Split(':');
+                        var name = appointmentSplitted.FirstOrDefault();
+                        var price = 1000d;
+                        if (appointmentSplitted.Length > 1 && double.TryParse(appointmentSplitted.Last(), out var parsedPrice))
+                            price = parsedPrice;
+                        <tr>
+                            <th scope="row">@(1 + services.IndexOf(appointment))</th>
+                            <td>@appointment.Split(":").First().Replace("-", string.Empty).FirstCharToUpper()</td>
+                            <td>
+                                <input type="hidden" name="newServices[][name]" value="@name"/>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" class="form-control prices" name="newServices[][price]" value="@price"/>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th scope="row"></th>
+                        <td></td>
+                        <td id="total-price">
+
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <script>
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+  async function PrintElem(elem)
+  {
+      var mywindow = window.open('', 'PRINT', 'height=500,width=780');
+  
+      mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+      mywindow.document.write('<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css"/>');
+      mywindow.document.write('</head><body>');
+      mywindow.document.write(document.getElementById(elem).innerHTML);
+      mywindow.document.write('</body></html>');
+      
+      await delay(2000);
+  
+      mywindow.document.close(); // necessary for IE >= 10
+      mywindow.focus(); // necessary for IE >= 10*/
+  
+      mywindow.print();
+      mywindow.close();
+  
+      return true;
+  }
+        
+            var totalPrice = 0;
+            var prices = document.getElementsByClassName("prices");
+            for (var i = 0; i < prices.length; i++) {
+                prices[i].addEventListener("change", calculateTotal);
+                totalPrice += parseFloat(prices[i].value);
+            }
+            document.getElementById("total-price").textContent = "Total Price: " + totalPrice;
+            
+            function calculateTotal() {
+                totalPrice = 0;
+                for (var i = 0; i < prices.length; i++) {
+                    totalPrice += parseFloat(prices[i].value);
+                }
+                document.getElementById("total-price").textContent = "Total Price: " + totalPrice;
+            }
+        </script>
+        <button class="btn btn-primary" type="button" onclick="PrintElem('print')">
+            <i class="bi bi-printer-fill"></i> Print Invoice
+        </button>
+    </form>
+
+    <div class="visually-hidden" id="print">
+        <div class="container-fluid row m-4">
+            <div class="container">
+                <img class="mx-auto d-block" src="~/images/Picture1.svg">
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.Name, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.Name)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.Address, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.Address)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Patient.CellphoneNumber, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Patient.CellphoneNumber)
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.ExpiresAt, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.ExpiresAt)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Date, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Date)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Doctor.UserName, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Doctor.DoctorName)
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Service</th>
+                    <th scope="col">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    var totalPrice = 0d;
+                    var services = Model.Services.Split(",").ToList();
+                    foreach (var appointment in services)
+                    {
+                        var appointmentSplitted = appointment.Split(':');
+                        var name = appointmentSplitted.FirstOrDefault();
+                        var price = 1000d;
+                        if (appointmentSplitted.Length > 1 && double.TryParse(appointmentSplitted.Last(), out var parsedPrice))
+                            price = parsedPrice;
+                        totalPrice += price;
+                        <tr>
+                            <th scope="row">@(1 + services.IndexOf(appointment))</th>
+                            <td>@appointment.Split(":").First().Replace("-", string.Empty).FirstCharToUpper()</td>
+                            <td>
+                                <input type="hidden" name="newServices[][name]" value="@name"/>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" class="form-control prices" name="newServices[][price]" value="@price"/>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th scope="row"></th>
+                        <td></td>
+                        <td id="total-price">
+                           ₱@totalPrice
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <form method="post" action="/appointments/add/service/@Model.AppointmentId/">
+        <div class="modal fade" id="newservicemodal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="appointment-title"></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" type="text" id="newservicename" name="newservicename"/>
+                            <label for="newservicename"></label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" type="text" id="newserviceamount" name="newserviceamount"/>
+                            <label for="newserviceamount"></label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-plus-lg"></i> Add Service</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <div class="container">
+        <p class="text-center text-danger">There are no current appointments, appointments have 30 minutes until they expire.</p>
+    </div>
+}

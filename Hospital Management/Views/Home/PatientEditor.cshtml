@@ -1,0 +1,107 @@
+﻿@using Hospital_Management.Utilities
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Dynamic
+@model Patient
+@{
+    ViewData["Title"] = "Edit Patients";
+    Patient? currentPatient = null;
+    if (ViewData.TryGetValue("Patient", out var j) && j is Patient p)
+    {
+        currentPatient = p;
+    }
+    var textBoxClasses = new
+    {
+        @@class = "form-control"
+    };
+    var textBoxClassesReadonly = new Dictionary<string, object>()
+    {
+        { "class", "form-control" },
+        { "readonly", "readonly" },
+    };
+}
+@if (currentPatient is {})
+{
+    <form method="post" class="container-fluid m-4" action="/patients/edit" enctype="multipart/form-data">
+        <h4>Edit Patient</h4>
+        <div class="container-fluid row">
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Id, htmlAttributes: textBoxClassesReadonly)
+                    @Html.LabelFor(x => x.Id)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Name, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Name)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Address, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Address)
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Birthdate" value="@Model.Birthdate" class="form-control"/>
+                    @* @Html.TextBoxFor(m => m.Birthdate, htmlAttributes: textBoxClasses) *@
+                    @Html.LabelFor(x => x.Birthdate)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.CellphoneNumber, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.CellphoneNumber)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Email, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Email)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Guardian, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Guardian)
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input name="appointments" class="form-control" readonly="readonly" type="text" value="@string.Join(",", currentPatient.Appointments.SelectMany(x => x.Services.Split(",").Select(xo => xo.Trim())))"/>
+                    @Html.LabelFor(x => x.Appointments)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.PulseRate, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.PulseRate)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.BloodPressure, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.BloodPressure)
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.Allergy, htmlAttributes: textBoxClasses)
+                    @Html.LabelFor(x => x.Allergy)
+                </div>
+                <div class="mb-3">
+                    @{
+                        if (!string.IsNullOrWhiteSpace(Model.Image))
+                        {
+                            <img style="max-width: 175px" src="@Model.Image" class="img-fluid rounded-3 m-2"/>
+                        }
+                    }
+                    <input id="image" type="file" name="image" class="form-control" aria-required="true"/>
+                    <label for="image">Ohter Image</label>
+                </div>
+                <div class="mb-3">
+                    @{
+                        if (!string.IsNullOrWhiteSpace(Model.PrescriptionImage))
+                        {
+                            <img style="max-width: 175px" src="@Model.PrescriptionImage" class="img-fluid rounded-3 m-2"/>
+                        }
+                    }
+                    <input id="image" type="file" name="prescriptionImage" class="form-control" aria-required="true"/>
+                    <label for="precriptionImage">Prescription Image</label>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-save"></i> Save
+        </button>
+    </form>
+}
+else
+{
+    <div class="container">
+        <p class="text-center text-danger">Patient does not exist.</p>
+    </div>
+}

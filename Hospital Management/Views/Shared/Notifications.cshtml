@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+}
+<div class="position-fixed fixed-bottom end-0 d-flex flex-row-reverse" style="pointer-events: none">
+    <div class="d-flex flex-column" id="notifications">
+        @* *@
+        @* <div class="alert alert-warning alert-dismissible fade show" role="alert" style="pointer-events: all"> *@
+        @*     <strong></strong> You should check in on some of those fields below. *@
+        @*     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> *@
+        @* </div> *@
+    </div>
+        
+
+</div>
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+    
+window.onload = function(e){ 
+    
+       const currentUserId = '@(currentUser?.Id)';
+         const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+         
+         connection.start().then(function () {
+             // document.getElementById("sendButton").disabled = false;
+         }).catch(function (err) {
+             
+         });
+         
+         connection.on("ReceiveNotification", function (user, message) {
+             if (currentUserId !== user)
+                 return;
+             
+             let msg = message.replace(/&/g, "&").replace(/&/g, ">");
+             let currentDiv = document.getElementById('notifications');
+             currentDiv.innerHTML += `
+             <div class="alert alert-warning alert-dismissible fade show" role="alert" style="pointer-events: all">
+                 <i class="bi bi-bell-fill"></i> ${msg}
+                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+             </div>
+`;
+             
+             // var li = document.createElement("li");
+             // li.classList.add("list-group-item");
+             // li.classList.add("rounded-4");
+             // li.classList.add("m-2");
+             // li.classList.add("border-1");
+             // li.textContent = encodedMsg;
+             // document.getElementById("messagesList").appendChild(li);
+         });
+         
+}
+  
+    
+    // document.getElementById("sendButton").addEventListener("click", function (event) {
+    //     var user = '@User.Identity.Name';
+    //     var message = document.getElementById("messageInput").value;
+    //     connection.invoke("SendMessage", user, message).catch(function (err) {
+    //         return console.error(err.toString());
+    //     });
+    //     event.preventDefault();
+    // });
+</script>
+

@@ -1,0 +1,52 @@
+﻿@model AppointmentModel
+@using Itenso.TimePeriod
+@{
+    ViewData["Title"] = "Invoice";
+}
+<div class="card">
+    <div class="card-body mx-4">
+
+        <div class="d-flex justify-content-center">
+            <img class="img-fluid" src="/images/Picture1.svg"/>
+        </div>
+        <div class="container">
+            <p class="m-2" style="font-size: 30px;"><i class="bi bi-hospital"></i> Thank you, your appointment is at @Model.Date</p>
+            @* <div class="row"> *@
+            @*     <ul class="list-unstyled"> *@
+            @*         <li class="text-black">@ViewData["FName"]</li> *@
+            @*         <li class="text-black mt-1">@DateTime.Now</li> *@
+            @*     </ul> *@
+            @*     <hr> *@
+            @* </div> *@
+            @* <div class="row"> *@
+            @*     <div class="col-xl-10"> *@
+            @*         <p>Consulting</p> *@
+            @*     </div> *@
+            @*     <div class="col-xl-2"> *@
+            @*         <p class="float-end"> *@
+            @*             ₱600 *@
+            @*         </p> *@
+            @*     </div> *@
+            @*     <hr> *@
+            @* </div> *@
+            @* <div class="row text-black"> *@
+            @* *@
+            @*     <div class="col-xl-12"> *@
+            @*         <p class="float-end fw-bold"> *@
+            @*             Total: ₱600 *@
+            @*         </p> *@
+            @*         <p class="float-start"> *@
+            @*             Change: ₱@ViewData["Change"] *@
+            @*         </p> *@
+            @*     </div> *@
+            @*     <hr style="border: 2px solid black;"> *@
+            @* </div> *@
+            <div class="text-center" style="margin-top: 90px;">
+                <a href='/'>
+                    <u class="text-info">Go Home</u>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

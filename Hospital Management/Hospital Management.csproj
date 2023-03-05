@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-Hospital_Management-BA966709-567F-43A5-AF0C-22B04F818F6A</UserSecretsId>
+        <RootNamespace>Hospital_Management</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
+        <PackageReference Include="TimePeriodLibrary.NET" Version="2.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture10.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture11.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture4.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture5.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture6.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture7.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture8.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\aboutus\Picture9.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\0x0.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\24-247732_windows-logos-png-windows-7-icon-png-transparent.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\301372720_1059639654702668_8121763722994792762_n.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\305171015_1190570804833492_4858153627477702489_n.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\310503355_912932703206390_4141698075054548269_n.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\325158986_511382704183862_373719167355588265_n.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\39eb2262b286076742bd6d94b849f90b.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\Euwu9YcVkAA3GjE.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\Idk.webp" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\image (1).jfif" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\logo-sm-mall-of-asia_0.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\Skrillex-removebg-preview.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\clients\smile-makeovers-zirconia-crowns-01.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture12.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture13.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture14.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture15.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture16.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture17.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture18.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture19.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture20.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture21.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture22.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture23.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture24.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture25.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture26.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture27.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture28.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture29.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\services\Picture30.png" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+@if (SignInManager.IsSignedIn(User))
+{
+    <h1 class="display-4">Welcome</h1>
+    <div class="d-flex justify-content-center align-items-center align-middle">
+        To go to your admin dashboard to go <a class="btn btn-primary m-2" href="/dashboard">Dashboard</a> to register a Doctor go to <a class="btn btn-primary m-2" href="/register">Register</a>
+    </div>
+}
+else
+{
+    <div class="container-fluid mt-4">
+        <h1>Welcome to Comembo Care!</h1>
+    </div>
+}
+</div>

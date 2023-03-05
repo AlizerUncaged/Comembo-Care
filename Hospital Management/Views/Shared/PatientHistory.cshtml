@@ -1,0 +1,37 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+
+@{
+    Doctor? doctor = null;
+
+    if (ViewData.TryGetValue("Doctor", out var Doctor))
+    {
+        if (Doctor is Doctor actualDoctor)
+        {
+            doctor = actualDoctor;
+        }
+    }
+
+    IEnumerable<Patient> patients;
+
+    var patientsSet = DbContext.Patients;
+    if (doctor is {})
+        patients = await patientsSet.Include(x => x.Appointments)
+            .ThenInclude(x => x.Doctor)
+            .Where(x => x.Appointments.Any(y => y.Doctor != null && y.Doctor.Id == doctor.Id)).ToListAsync();
+    else
+        patients = await patientsSet.OrderByDescending(x => x.RegisterDate).ToListAsync();
+
+}
+
+@foreach (var patient in patients)
+{
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">@patient.UserName</h4>
+        <p>@patient.Tag</p>
+        <hr>
+        <p class="mb-0">Registered since @patient.RegisterDate</p>
+    </div>
+}

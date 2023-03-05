@@ -1,0 +1,70 @@
+﻿@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@{
+    Patient? patient = null;
+
+    if (ViewData.TryGetValue("Patient", out var rPatient))
+    {
+        if (rPatient is Patient actualPatient)
+        {
+            patient = actualPatient;
+        }
+    }
+
+    ViewData["Title"] = "Patient Dashboard";
+
+    IEnumerable<AppointmentModel> appointmentses = await DbContext.Appointments.Where(x => x.Patient.Id == patient.Id).ToListAsync();
+    IEnumerable<AppointmentModel> approvedAppointments = await DbContext.Appointments
+        .Include(x => x.Doctor)
+        .Where(x => x.Doctor != null && x.Patient.Id == patient.Id).ToListAsync();
+
+}
+<div class="d-flex flex-row bd-highlight m-3">
+    <div class="p-2 bd-highlight">
+        <a href="/registerAppointment" class="btn-primary btn"><i class="bi bi-plus-square-fill"></i> New Appointment</a>
+    </div>
+</div>
+
+<div class="container row">
+    @if (approvedAppointments.Any())
+    {
+        <h2>Your <strong>Approved</strong> Appointments</h2>
+        @foreach (var appointments in approvedAppointments)
+        {
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Dr. @appointments.Doctor.Name</h4>
+                <p>@appointments.Note</p>
+                <hr>
+                <p class="mb-0">Created at<strong> @appointments.DateCreated</strong></p>
+                <p class="mb-0">Meet at<strong> @appointments.Date</strong></p>
+                <p class="mb-0">Service<strong> @appointments.Services</strong></p>
+                <a href="/delete/@appointments.AppointmentId" class="btn btn-danger">Delete</a>
+            </div>
+        }
+    }
+</div>
+
+<div class="container row">
+    @if (appointmentses.Any())
+    {
+        <h2>Your Requested Appointments</h2>
+        @foreach (var appointments in appointmentses)
+        {
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading"></h4>
+                <p>@appointments.Note</p>
+                <hr>
+                <p class="mb-0">Created at<strong> @appointments.DateCreated</strong></p>
+                <p class="mb-0">Meet at<strong> @appointments.Date</strong></p>
+                <p class="mb-0">Service<strong> @appointments.Services</strong></p>
+                <a href="/delete/@appointments.AppointmentId" class="btn btn-danger">Delete</a>
+            </div>
+        }
+    }
+    else
+    {
+        <p>You have no requested appointments, request one now!</p>
+    }
+</div>
