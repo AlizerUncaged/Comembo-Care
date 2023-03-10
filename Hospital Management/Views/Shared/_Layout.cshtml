@@ -65,33 +65,28 @@
                     @*     </li> *@
                     @* } *@
 
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/aboutus">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/tos">Terms of Service</a>
+                    </li>
+                    
                     @if (!SignInManager.IsSignedIn(User))
                     {
                         // Patient
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/aboutus">About Us</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/services">Services</a>
-                        </li>
                         @* <li class="nav-item"> *@
                         @*     <a style="color: #004aad !important;" class="nav-link text-dark" href="/smile-makeovers">Appointment</a> *@
                         @* </li> *@
                     }
                     else if (User.IsInRole("Patient"))
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/aboutus">About Us</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/services">Services</a>
-                        </li>
                         @* <li class="nav-item"> *@
                         @*     <a class="nav-link text-dark" href="/smile-makeovers">Smile Makeovers</a> *@
                         @* </li> *@
@@ -137,6 +132,9 @@
                 </li>
                 <li class="nav-item text-white m-3">
                     <a href="/patients" class="nav-link text-white"><i class="bi bi-people me-2"></i> Patients</a>
+                </li>
+                <li class="nav-item text-white m-3">
+                    <a href="/admin/appointments" class="nav-link text-white"><i class="bi bi-calendar"></i> Appointments</a>
                 </li>
                 <li class="nav-item text-white m-3">
                     <a href="/Doctors" class="nav-link text-white"><i class="bi bi-file-earmark-image-fill me-2"></i> Doctor Images</a>
@@ -188,7 +186,6 @@ else if (User.IsInRole("Doctor"))
 }
 else if (User.IsInRole("Patient"))
 {
-    @await Html.PartialAsync("Notifications")
     <div class="container-fluid p-0">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -209,6 +206,7 @@ else
         </div>
     </footer>
 }
+@await Html.PartialAsync("Notifications")
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>

@@ -33,14 +33,14 @@
         <h2>Your <strong>Approved</strong> Appointments</h2>
         @foreach (var appointments in approvedAppointments)
         {
-            <div class="alert alert-success" role="alert">
-                <h4 class="alert-heading">Dr. @appointments.Doctor.Name</h4>
+            <div class="alert alert-success shadow container row" role="alert">
+                <h4 class="alert-heading fw-bolder">Dr. @appointments.Doctor.Name</h4>
                 <p>@appointments.Note</p>
                 <hr>
                 <p class="mb-0">Created at<strong> @appointments.DateCreated</strong></p>
                 <p class="mb-0">Meet at<strong> @appointments.Date</strong></p>
                 <p class="mb-0">Service<strong> @appointments.Services</strong></p>
-                <a href="/delete/@appointments.AppointmentId" class="btn btn-danger">Delete</a>
+                <a href="/delete/@appointments.AppointmentId" class="btn btn-danger"><i class="bi bi-trash3"></i> Delete</a>
             </div>
         }
     }
@@ -52,14 +52,17 @@
         <h2>Your Requested Appointments</h2>
         @foreach (var appointments in appointmentses)
         {
-            <div class="alert alert-success" role="alert">
+            <div class="alert alert-success container row" role="alert">
                 <h4 class="alert-heading"></h4>
                 <p>@appointments.Note</p>
                 <hr>
                 <p class="mb-0">Created at<strong> @appointments.DateCreated</strong></p>
                 <p class="mb-0">Meet at<strong> @appointments.Date</strong></p>
-                <p class="mb-0">Service<strong> @appointments.Services</strong></p>
-                <a href="/delete/@appointments.AppointmentId" class="btn btn-danger">Delete</a>
+                <p class="mb-2">Service<strong> @appointments.Services</strong></p>
+                <div class="container-fluid d-flex flex-row">
+                    <a href="/delete/@appointments.AppointmentId" class="btn btn-danger me-2 mb-2"><i class="bi bi-trash3"></i> Delete</a>
+                    <a href="/appointments/edit/@appointments.AppointmentId" class="btn btn-info me-2 mb-2"><i class="bi bi-pen"></i> Edit</a>
+                </div>
             </div>
         }
     }

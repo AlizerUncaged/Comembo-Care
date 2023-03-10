@@ -31,6 +31,12 @@ public class HomeController : Controller
         _hubContext = hubContext;
     }
 
+    [HttpGet("/tos")]
+    public async Task<IActionResult> Tos() => View();
+
+    [HttpGet("/admin/appointments")]
+    public async Task<IActionResult> AdminAppointments() =>
+        View();
 
     [HttpGet("/clearCookies")]
     public async Task<IActionResult> ClearCookies()
@@ -203,7 +209,7 @@ public class HomeController : Controller
         var appointment = await _dbContext.Appointments.FirstOrDefaultAsync(x => x.AppointmentId == appointmentId);
 
         appointment.IsDone = true;
-        
+
         _dbContext.Appointments.Update(appointment);
 
         await _dbContext.SaveChangesAsync();
@@ -251,10 +257,12 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet("/appointments/edit/{id}")]
     [HttpGet("/registerAppointment")]
-    public async Task<IActionResult> Appointment()
+    public async Task<IActionResult> Appointment(int? id)
     {
-        return View();
+        var existingAppointment = await _dbContext.Appointments.FirstOrDefaultAsync(x => x.AppointmentId == id);
+        return View(existingAppointment);
     }
 
     [HttpGet("/dashboard")]

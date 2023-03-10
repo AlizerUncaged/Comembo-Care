@@ -26,12 +26,12 @@ public class RegisterController : Controller
     }
 
     [HttpPost("/registerDoctor")]
-    public async Task<IActionResult> Register([FromForm] string name, [FromForm] string email, [FromForm] string address,
+    public async Task<IActionResult> Register([FromForm] string name, [FromForm] string email,
+        [FromForm] string address,
         [FromForm] string birthdate, [FromForm] string gender,
         [FromForm] string cellphoneNumber, [FromForm] string licenseNumber, [FromForm] string password,
         [FromForm] IFormFile? image)
     {
-
         if (await _userManager.FindByEmailAsync(email) is { } user)
         {
             return Redirect($"/registerDoctor?error={HttpUtility.UrlEncode("Email already registered!")}");
@@ -51,7 +51,7 @@ public class RegisterController : Controller
                 await image.CopyToAsync(stream);
                 stream.Close();
             }
-            
+
             DoctorImage = $"/images/doctors/{image.FileName}";
         }
 
@@ -60,7 +60,7 @@ public class RegisterController : Controller
             Name = name, Address = address, Gender = gender, Birthdate = birthdate, CellphoneNumber = cellphoneNumber,
             LicenseNumber = licenseNumber, UserName = name, DoctorImage = DoctorImage, Email = email
         };
-        
+
         var newEntity = await _dbContext.Doctors.AddAsync(Doctor);
 
         var registerResult = await _userManager.CreateAsync(Doctor, password);
@@ -81,15 +81,14 @@ public class RegisterController : Controller
         [FromForm] string birthdate, [FromForm] string gender, [FromForm] string email,
         [FromForm] string cellphoneNumber, [FromForm] string? guardian, [FromForm] string password)
     {
-        
         if (string.IsNullOrWhiteSpace(guardian))
             guardian = string.Empty;
-        
+
         if (await _userManager.FindByEmailAsync(email) is { } user)
         {
             return Redirect($"/registerPatient?error={HttpUtility.UrlEncode("Email already registered!")}");
         }
-        
+
         var Doctor = new Patient()
         {
             Name = name, Address = address, Gender = gender, Birthdate = birthdate, CellphoneNumber = cellphoneNumber,
@@ -114,7 +113,7 @@ public class RegisterController : Controller
 
     [HttpPost("/newAppointment")]
     public async Task<IActionResult> RegisterPatient([FromForm] string description, [FromForm] double paid,
-        [FromForm] DateTime? date, [FromForm] string[] concerns)
+        [FromForm] DateTime? date, [FromForm] string[] concerns, [FromForm] int? id)
     {
         var currentUser = await _userManager.GetUserAsync(User);
 
@@ -128,10 +127,21 @@ public class RegisterController : Controller
             Date = date, TotalPrice = paid
         };
 
-        var newEntity = await _dbContext.Appointments.AddAsync(Doctor);
+        if (id is { })
+        {
+            Doctor.AppointmentId = id;
+            _dbContext.Appointments.Update(Doctor);
+        }
+        else
+        {
+            Doctor = (await _dbContext.Appointments.AddAsync(Doctor)).Entity;
+        }
 
         await _dbContext.SaveChangesAsync();
 
-        return Redirect($"/Invoice?appointmentId={newEntity.Entity.AppointmentId}");
+        if (User.IsInRole("Admin"))
+            return Redirect("/admin/appointments");
+
+        return Redirect($"/Invoice?appointmentId={Doctor.AppointmentId}");
     }
 }

@@ -1,4 +1,5 @@
-﻿@using Hospital_Management.Utilities
+﻿@model AppointmentModel?
+@using Hospital_Management.Utilities
 @{
     ViewData["Title"] = "New Appointment";
 }
@@ -8,7 +9,7 @@
             <h2 class="mt-2">Create a new appointment.</h2>
             <p>
                 To schedule an appointment for yourMedical Laboratory Test Requirements,
-                dial our hotlines (02)8-000-0000 to 89 and our friendly Client Service personnel will 
+                dial our hotlines (02)8-000-0000 to 89 and our friendly Client Service personnel will
                 gladly assist you.
                 <br/>
                 <br/>
@@ -17,12 +18,17 @@
                 provide further instructions to help you prepare for your test requirements.
             </p>
             <hr/>
+            <input type="hidden" name="id" value="@Model?.AppointmentId"/>
             <div class="form-floating mb-3">
-                <input id="birthdate-id" type="datetime-local" name="date" class="form-control" aria-required="true"/>
+                <input value="@(Model?.Date.Value.ToString("yyyy-MM-ddTHH:mm:ss"))" id="birthdate-id" type="datetime-local" name="date" class="form-control" aria-required="true"/>
                 <label for="birthdate-id">Date and Time of Visit</label>
             </div>
             <div class="form-floating mb-3">
-                <textarea style="height: 150px;" id="desc" rows="5" type="text" name="description" class="form-control" autocomplete="username" aria-required="true" placeholder=""></textarea>
+                <textarea style="height: 150px;" id="desc" rows="5" 
+type="text" name="description" class="form-control" autocomplete="off"
+ aria-required="true" placeholder="">
+@(Model?.Note)
+</textarea>
                 <label for="desc">Message</label>
             </div>
             @* *@
