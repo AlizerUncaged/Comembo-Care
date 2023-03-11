@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Microsoft.AspNetCore.Identity;
@@ -79,7 +80,8 @@ public class RegisterController : Controller
     [HttpPost("/registerPatient")]
     public async Task<IActionResult> RegisterPatient([FromForm] string name, [FromForm] string address,
         [FromForm] string birthdate, [FromForm] string gender, [FromForm] string email,
-        [FromForm] string cellphoneNumber, [FromForm] string? guardian, [FromForm] string password)
+        [FromForm] string cellphoneNumber, [FromForm] string? guardian, [FromForm] string password,
+        [FromForm] string? referer)
     {
         if (string.IsNullOrWhiteSpace(guardian))
             guardian = string.Empty;
@@ -92,7 +94,7 @@ public class RegisterController : Controller
         var Doctor = new Patient()
         {
             Name = name, Address = address, Gender = gender, Birthdate = birthdate, CellphoneNumber = cellphoneNumber,
-            Guardian = guardian, UserName = name, Email = email
+            Guardian = guardian, UserName = name, Email = email, RefererDoctor = referer
         };
 
         var newEntity = await _dbContext.Patients.AddAsync(Doctor);
@@ -116,6 +118,21 @@ public class RegisterController : Controller
         [FromForm] DateTime? date, [FromForm] string[] concerns, [FromForm] int? id)
     {
         var currentUser = await _userManager.GetUserAsync(User);
+
+        var appointments = await _dbContext.Appointments.ToListAsync();
+
+        foreach (var appointment in appointments)
+        {
+            var start = appointment.Date;
+            var end = start?.AddHours(1);
+
+            if (date >= start && date <= end)
+            {
+                // There's a current appointment in this time.
+                return Redirect(
+                    $"/registerAppointment?error=There's an ongoing appointment ongoing at that time until {(end?.ToString("h:mm tt", CultureInfo.InvariantCulture))}!");
+            }
+        }
 
         var currentPatient =
             await _dbContext.Patients.FirstOrDefaultAsync(x => x.Id == currentUser.Id);

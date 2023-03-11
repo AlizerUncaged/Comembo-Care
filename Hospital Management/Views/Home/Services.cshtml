@@ -1,9 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using System.Linq;
+@model List<dynamic> 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
 @{
     ViewData["Title"] = "Home Page";
+
 }
 
 <div class="container-fluid">
@@ -12,23 +15,24 @@
         <h1 class="text-center">Our Services</h1>
     </div>
     <ul class="list-group bg-grey list-group-flush">
-        @{
-            var services = @"CBC
-FBS
-CREA
-BUA
-CHOLESTEROL
-SGPT
-URINE TEST
-STOOL EXAM
-X RAY BIG
-NEORO-PHYCH".Split(Environment.NewLine).Select(x => x.Trim());
 
-            foreach (var service in services)
+        <ul class="list-group">
+            @for (char i = 'a'; i <= 'z'; i++)
             {
-                <li class="list-group-item bg-grey fw-bold">@service</li>
+                var servicesThatStarts = @Model.Where(x => (x.Name as string).ToLower().StartsWith(i));
+
+                if (servicesThatStarts.Any())
+                {
+                    <li class="list-group-item text-light bg-primary">@i.ToString().ToUpper()</li>
+                    @foreach (var item in servicesThatStarts)
+                    {
+                        <li class="list-group-item">
+                            <a class="text-dark text-decoration-none" href="/services/view/@item.Name">@item.Name</a>
+                        </li>
+                    }
+                }
             }
-        }
+        </ul>
     </ul>
 
 </div>

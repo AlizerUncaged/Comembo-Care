@@ -15,7 +15,7 @@
     }
 
     var Doctors = await DbContext.Doctors.ToListAsync();
-    Doctors = Doctors.Where(x => x.UserName.ToLower().Contains(search.ToLower()) && x.Email != RoleCreation.DoctorEmail).ToList();
+    Doctors = Doctors.Where(x => x.UserName.ToLower().Contains(search.ToLower())).ToList();
 
 }
 

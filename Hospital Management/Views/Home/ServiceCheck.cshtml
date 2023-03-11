@@ -1,0 +1,22 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = @Model.Name;
+    Layout = "_Layout";
+
+
+    var modelDesc = (Model.Description as string);
+}
+
+<div class="container-fluid mt-4 text-center">
+    <h1 class="m-4">@Model.Name</h1>
+    <div class="row">
+        <div class="col">
+            <p class="text-end my-auto">
+                @Html.Raw(modelDesc)
+            </p>
+        </div>
+        <div class="col">
+            <img class="img-fluid rounded-4" src="@Model.Image"/>
+        </div>
+    </div>
+</div>

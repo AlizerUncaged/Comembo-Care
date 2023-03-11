@@ -36,7 +36,7 @@
                 <label for="birthdate">Birthdate</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" id="email" name="email" class="form-control" aria-required="true"/>
+                <input type="email" id="email" name="email" class="form-control" aria-required="true"/>
                 <label for="email">Email</label>
             </div>
             <div class="row mb-3">
@@ -53,8 +53,22 @@
                 </div>
             </div>
             <div class="form-floating mb-3">
-                <input type="number" id="cellphoneNumber" name="cellphoneNumber" class="form-control" aria-required="true"/>
+                <input maxlength="11" type="text" pattern="\d*" id="cellphoneNumber" name="cellphoneNumber" class="form-control" aria-required="true"/>
                 <label for="cellphoneNumber">Cellphone Number</label>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input type="text" id="referer" name="referer" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                <label for="referer">Doctor Name (Optional)</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" id="tos-check" class="form-check-input" aria-required="true"/>
+                <label for="tos-check" class="form-check-label">I agree to the <a href="/tos">terms and services</a>.</label>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" id="senior" class=" form-check-input" aria-required="true"/>
+                <label for="senior" class="form-check-label">I am a Senior Citizen or PWD.</label>
             </div>
             @* <div class="form-floating mb-3"> *@
             @*     <input type="text" id="guardian" name="guardian" class="form-control" aria-required="true"/> *@
@@ -65,7 +79,13 @@
                 <label for="password">Password</label>
             </div>
 
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary"><i class="bi bi-box-arrow-right"></i> Register</button>
+            <button onclick="if (!document.getElementById('tos-check').checked) { alert('You need to agree to terms and conditions first!'); return false;}" id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary"><i class="bi bi-box-arrow-right"></i> Register</button>
         </form>
+        <div class="container-fluid row mt-2">
+            <p class="opacity-50 fst-italic">
+                Need assistance? Please call Comembo Care On-Call at 6388-8777 or email us at Comembocare@gmail.com
+                
+            </p>
+        </div>
     </div>
 </div>

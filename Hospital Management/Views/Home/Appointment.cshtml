@@ -1,75 +1,96 @@
 ﻿@model AppointmentModel?
+@inject IHttpContextAccessor HttpContextAccessor
 @using Hospital_Management.Utilities
 @{
     ViewData["Title"] = "New Appointment";
 }
+
+@if (HttpContextAccessor.HttpContext!.Request.Query.TryGetValue("error", out var errorString))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorString
+    </div>
+}
+
+@if (HttpContextAccessor.HttpContext!.Request.Query.TryGetValue("info", out var info))
+{
+    <div class="alert alert-info" role="alert">
+        @info
+    </div>
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
 <div class="row m-4">
     <div class="container">
         <form id="registerForm" action="/newAppointment" method="post">
-            <h2 class="mt-2">Create a new appointment.</h2>
-            <p>
-                To schedule an appointment for yourMedical Laboratory Test Requirements,
-                dial our hotlines (02)8-000-0000 to 89 and our friendly Client Service personnel will
-                gladly assist you.
-                <br/>
-                <br/>
-                You may also fill-up the eForm below, and click SUBMIT at the buttom of the page.
-                Our Cliet Service staff will soon to call you to confirm your appointment request and will
-                provide further instructions to help you prepare for your test requirements.
-            </p>
-            <hr/>
-            <input type="hidden" name="id" value="@Model?.AppointmentId"/>
-            <div class="form-floating mb-3">
-                <input value="@(Model?.Date.Value.ToString("yyyy-MM-ddTHH:mm:ss"))" id="birthdate-id" type="datetime-local" name="date" class="form-control" aria-required="true"/>
-                <label for="birthdate-id">Date and Time of Visit</label>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea style="height: 150px;" id="desc" rows="5" 
+        <h2 class="mt-2">Create a new appointment.</h2>
+        <p>
+            To schedule an appointment for yourMedical Laboratory Test Requirements,
+            dial our hotlines (02)8-000-0000 to 89 and our friendly Client Service personnel will
+            gladly assist you.
+            <br/>
+            <br/>
+            You may also fill-up the eForm below, and click SUBMIT at the buttom of the page.
+            Our Cliet Service staff will soon to call you to confirm your appointment request and will
+            provide further instructions to help you prepare for your test requirements.
+        </p>
+        <hr/>
+        <input type="hidden" name="id" value="@Model?.AppointmentId"/>
+        <input class="form-floating mb-3">
+        <input min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" value="@(Model?.Date.Value.ToString("yyyy-MM-ddTHH:mm"))" 
+               id="birthdate-id" type="datetime-local" name="date" class="form-control"
+               aria-required="true">
+        <label for="birthdate-id">Date and Time of Visit</label>
+
+    <div class="form-floating mb-3">
+        <textarea style="height: 150px;" id="desc" rows="5" 
 type="text" name="description" class="form-control" autocomplete="off"
  aria-required="true" placeholder="">
 @(Model?.Note)
 </textarea>
-                <label for="desc">Message</label>
-            </div>
-            @* *@
-            @* <div class="mb-3"> *@
-            @*     <label class="form-label form-control">Your Concerns</label> *@
-            @*     @foreach (var i in new[] { "braces", "cleaning", "consultation", "crown", "filling", "teeth-whitening", "tooth extraction", "veneers", "x-ray" }) *@
-            @*     { *@
-            @*         <div class="form-check"> *@
-            @*             <input class="form-check-input" type="checkbox" id="@i" name="concerns[]" value="@i"> *@
-            @*             <label class="form-check-label" for="@i">@i.Replace("-", " ").FirstCharToUpper()</label> *@
-            @*             <br> *@
-            @*         </div> *@
-            @*     } *@
-            @* </div> *@
-
-            <button id="registerSubmit" type="submit" class="w-100 m-2 btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-hand-thumbs-up-fill"></i> Submit</button>
-            <!-- Modal -->
-            @* <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> *@
-            @*     <div class="modal-dialog"> *@
-            @*         <div class="modal-content"> *@
-            @*             <div class="modal-header"> *@
-            @*                 <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-send-fill"></i> Submit</h5> *@
-            @*                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
-            @*             </div> *@
-            @*             <div class="modal-body"> *@
-            @*                 <div class="input-group mb-3"> *@
-            @*                     <span class="input-group-text" id="basic-addon1">₱</span> *@
-            @*                     <input disabled value="600.00" type="text" class="form-control" aria-describedby="basic-addon1"> *@
-            @*                 </div> *@
-            @*                 <div class="input-group mb-3"> *@
-            @*                     <span class="input-group-text">₱</span> *@
-            @*                     <input id="user-payment" name="paid" type="text" class="form-control" aria-describedby="basic-addon1"> *@
-            @*                     <label class="form-control" for="user-payment">Your Payment</label> *@
-            @*                 </div> *@
-            @*             </div> *@
-            @*             <div class="modal-footer"> *@
-            @*                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
-        </form>
+        <label for="desc">Message</label>
     </div>
+    @* *@
+    @* <div class="mb-3"> *@
+    @*     <label class="form-label form-control">Your Concerns</label> *@
+    @*     @foreach (var i in new[] { "braces", "cleaning", "consultation", "crown", "filling", "teeth-whitening", "tooth extraction", "veneers", "x-ray" }) *@
+    @*     { *@
+    @*         <div class="form-check"> *@
+    @*             <input class="form-check-input" type="checkbox" id="@i" name="concerns[]" value="@i"> *@
+    @*             <label class="form-check-label" for="@i">@i.Replace("-", " ").FirstCharToUpper()</label> *@
+    @*             <br> *@
+    @*         </div> *@
+    @*     } *@
+    @* </div> *@
+
+    <button id="registerSubmit" type="submit" class="w-100 m-2 btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-hand-thumbs-up-fill"></i> Submit</button>
+    <!-- Modal -->
+    @* <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> *@
+    @*     <div class="modal-dialog"> *@
+    @*         <div class="modal-content"> *@
+    @*             <div class="modal-header"> *@
+    @*                 <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-send-fill"></i> Submit</h5> *@
+    @*                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+    @*             </div> *@
+    @*             <div class="modal-body"> *@
+    @*                 <div class="input-group mb-3"> *@
+    @*                     <span class="input-group-text" id="basic-addon1">₱</span> *@
+    @*                     <input disabled value="600.00" type="text" class="form-control" aria-describedby="basic-addon1"> *@
+    @*                 </div> *@
+    @*                 <div class="input-group mb-3"> *@
+    @*                     <span class="input-group-text">₱</span> *@
+    @*                     <input id="user-payment" name="paid" type="text" class="form-control" aria-describedby="basic-addon1"> *@
+    @*                     <label class="form-control" for="user-payment">Your Payment</label> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*             <div class="modal-footer"> *@
+    @*                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </div> *@
+    @* </div> *@
+    </form>
+</div>
 </div>

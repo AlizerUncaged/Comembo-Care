@@ -21,6 +21,10 @@ namespace Hospital_Management.Models
         // [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString =  "{0:yyyy-MM-ddTHH:mm}")]
         [FromForm()]
         public string? Birthdate { get; set; }
+        
+        [FromForm()] 
+        public string? RefererDoctor { get; set; }
+        
 
         [FromForm()] public string? Gender { get; set; }
 
