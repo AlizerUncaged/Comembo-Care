@@ -25,6 +25,10 @@ body {
   
 }
 
+.bg-blue {
+  background-color: #004AAD !important;
+}
+
 .bg-grey {
   background-color: #dbe1e8 !important;
 }

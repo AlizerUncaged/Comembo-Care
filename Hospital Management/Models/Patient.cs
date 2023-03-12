@@ -22,8 +22,13 @@ namespace Hospital_Management.Models
         [FromForm()]
         public string? Birthdate { get; set; }
         
+        
+        
         [FromForm()] 
         public string? RefererDoctor { get; set; }
+        
+        [FromForm()] 
+        public bool? IsSenior { get; set; }
         
 
         [FromForm()] public string? Gender { get; set; }

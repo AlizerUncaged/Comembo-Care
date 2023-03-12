@@ -1,0 +1,52 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model Medicine?
+@{
+    ViewData["Title"] = "Register Doctor";
+    var error = string.Empty;
+    if (HttpContextAccessor.HttpContext.Request.Query.TryGetValue("error", out var errorString))
+    {
+        error = errorString.ToString();
+    }
+}
+
+
+<div class="row container-fluid">
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>An error occured!</strong> @error
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+</div>
+
+<div class="row m-4">
+    <div class="container">
+        <form id="registerForm" action="/registerMedicine" method="post" enctype="multipart/form-data">
+            <h2>Register new medicine.</h2>
+            <hr/>
+            <input type="hidden" name="id" class="form-control" value="@Model?.Id" autocomplete="username" aria-required="true"/>
+            <div class="form-floating mb-3">
+                <input value="@Model?.MedicineName" id="nameid" type="text" name="name" class="form-control" autocomplete="username" aria-required="true"/>
+                <label for="nameid">Medicine Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input value="@Model?.Quantity" type="number" name="quantity" id="addresId" class="form-control" aria-required="true"/>
+                <label for="addresId">Quantity</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input value="@Model?.Price" type="text" name="price" id="addresId" class="form-control" aria-required="true"/>
+                <label for="addresId">Price</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input value="@Model?.ExpiryDate" type="datetime-local" name="expiry" id="addresId" class="form-control" aria-required="true"/>
+                <label for="addresId">Expiry Date</label>
+            </div>
+            <div class="mb-3">
+                <input id="image" type="file" name="image" class="form-control" aria-required="true"/>
+                <label for="image">Medicine Image</label>
+            </div>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary"><i class="bi bi-box-arrow-right"></i> Register</button>
+        </form>
+    </div>
+</div>

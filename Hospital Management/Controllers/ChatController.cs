@@ -21,6 +21,13 @@ public class ChatController : Controller
         _logger = logger;
     }
 
+    
+    [HttpGet("/doctor/support")]
+    public async Task<IActionResult> SupportChat()
+    {
+        return View();
+    }
+
     [HttpGet("/chat/{patientId}")]
     public async Task<IActionResult> OneToOneChat(string patientId)
     {

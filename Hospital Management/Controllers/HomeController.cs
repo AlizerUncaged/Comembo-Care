@@ -44,7 +44,8 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         new
         {
             Price = 250,
-            Image = "https://bookmerilab.com/tests/wp-content/uploads/2022/05/Liver-damage-such-as-Cirrhosis-and-Fibrosis.-1.png",
+            Image =
+                "https://bookmerilab.com/tests/wp-content/uploads/2022/05/Liver-damage-such-as-Cirrhosis-and-Fibrosis.-1.png",
             Name = "SGPT (serum glutamate-pyruvate transaminase)",
             Description =
                 @"serum glutamate-pyruvate transaminase or serum glutamic-pyruvic transaminase. An enzyme found in the liver and other tissues. A high level of SGPT released into the blood may be a sign of liver damage, cancer, or other diseases."
@@ -52,7 +53,8 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         new
         {
             Price = 70,
-            Image = "https://www.news-medical.net/image.axd?picture=2016%2F6%2FUrine_analysis_shutterstock_146356910.jpg",
+            Image =
+                "https://www.news-medical.net/image.axd?picture=2016%2F6%2FUrine_analysis_shutterstock_146356910.jpg",
             Name = "Urine Test",
             Description =
                 @"A urinalysis is a test of your urine. It's used to detect and manage a wide range of disorders, such as urinary tract infections, kidney disease and diabetes. A urinalysis involves checking the appearance, concentration and content of urine."
@@ -60,7 +62,8 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         new
         {
             Price = 150,
-            Image = "https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2022/05/stool_sample_test_732x549_thumb-732x549.jpg",
+            Image =
+                "https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2022/05/stool_sample_test_732x549_thumb-732x549.jpg",
             Name = "Stool Exam",
             Description =
                 @"A stool test examines a sample of faeces (poo) in the laboratory. There are many different types of stool tests, to check for bowel cancer, gastrointestinal infections and other health conditions."
@@ -76,7 +79,8 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         new
         {
             Price = 250,
-            Image = "https://b2257157.smushcdn.com/2257157/wp-content/uploads/2021/10/1218573_FM_BlogImages_2_102621-1024x512.jpg?lossy=1&strip=1&webp=1",
+            Image =
+                "https://b2257157.smushcdn.com/2257157/wp-content/uploads/2021/10/1218573_FM_BlogImages_2_102621-1024x512.jpg?lossy=1&strip=1&webp=1",
             Name = "Neoropsychology",
             Description =
                 @"Neuropsychology is concerned with relationships between the brain and behavior. Neuropsychologists conduct evaluations to characterize behavioral and cognitive changes resulting from central nervous system disease or injury, like Parkinson's disease or another movement disorder."
@@ -105,6 +109,19 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
     [HttpGet("/tos")]
     public async Task<IActionResult> Tos() => View();
+
+
+    [HttpGet("/medicine/view")]
+    public async Task<IActionResult> MedicineList() => View();
+
+
+    [HttpGet("/medicine/update")]
+    [HttpGet("/medicine/update/{id}")]
+    public async Task<IActionResult> RegisterMedicine(long? id)
+    {
+        return View(await _dbContext.Medicines.FirstOrDefaultAsync(x => x.Id == id));
+    }
+
 
     [HttpGet("/admin/appointments")]
     public async Task<IActionResult> AdminAppointments() =>

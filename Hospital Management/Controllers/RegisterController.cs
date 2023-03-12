@@ -72,9 +72,85 @@ public class RegisterController : Controller
 
         await _dbContext.SaveChangesAsync();
 
-        await _signInManager.SignInAsync(newEntity.Entity, true);
 
         return RedirectPermanent("/");
+    }
+
+    [HttpPost("/registerMedicine")]
+    public async Task<IActionResult> Register(
+        [FromForm] string? name,
+        [FromForm] long? id,
+        [FromForm] long? quantity,
+        [FromForm] double? price,
+        [FromForm] IFormFile? image,
+        [FromForm] DateTime? expiry
+    )
+    {
+        string medicineImage = null;
+        if (image is { })
+        {
+            var path = Path.Combine(_environment.WebRootPath, "images", "med");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            path = Path.Combine(path, image.FileName);
+
+            using (FileStream stream = new FileStream(path, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+                stream.Close();
+            }
+
+            medicineImage = $"/images/med/{image.FileName}";
+        }
+
+        var medicine = await _dbContext.Medicines.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (medicine is { }) // update
+        {
+            if (name is { })
+                medicine.MedicineName = name;
+
+            if (quantity is { })
+                medicine.Quantity = quantity.Value;
+
+            if (price is { })
+                medicine.Price = price.Value;
+
+            if (image is { })
+                medicine.Image = medicineImage;
+            
+            if (expiry is { })
+                medicine.ExpiryDate = expiry.GetValueOrDefault();
+
+            _dbContext.Medicines.Update(medicine);
+        }
+        else
+        {
+            medicine ??= new Medicine();
+
+            if (name is { })
+                medicine.MedicineName = name;
+
+            if (quantity is { })
+                medicine.Quantity = quantity.Value;
+
+            if (price is { })
+                medicine.Price = price.Value;
+
+            if (image is { })
+                medicine.Image = medicineImage;
+
+            if (expiry is { })
+                medicine.ExpiryDate = expiry.GetValueOrDefault();
+            
+            await _dbContext.Medicines.AddAsync(medicine);
+        }
+
+
+        await _dbContext.SaveChangesAsync();
+
+        return RedirectPermanent("/medicine/view");
     }
 
     [HttpPost("/registerPatient")]
@@ -108,7 +184,6 @@ public class RegisterController : Controller
 
         await _dbContext.SaveChangesAsync();
 
-        await _signInManager.SignInAsync(newEntity.Entity, true);
 
         return Redirect("/");
     }

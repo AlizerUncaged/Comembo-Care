@@ -11,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Doctor> Doctors { get; set; }
 
     public DbSet<Chat> Chats { get; set; }
+    
+    public DbSet<Medicine> Medicines { get; set; }
 
     public DbSet<AppointmentPayment> MedicinePayments { get; set; }
 

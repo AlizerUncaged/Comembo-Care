@@ -38,7 +38,6 @@
         </p>
         <hr/>
         <input type="hidden" name="id" value="@Model?.AppointmentId"/>
-        <input class="form-floating mb-3">
         <input min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" value="@(Model?.Date.Value.ToString("yyyy-MM-ddTHH:mm"))" 
                id="birthdate-id" type="datetime-local" name="date" class="form-control"
                aria-required="true">

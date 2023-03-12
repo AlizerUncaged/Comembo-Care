@@ -1,0 +1,170 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@{
+
+}
+<div class="position-fixed fixed-bottom end-0 d-flex flex-row-reverse" style="pointer-events: none">
+    <div class="d-flex flex-column" id="notifications">
+        <div onmousedown="toggleFloatingVisible()" class="rounded-circle bg-blue m-4 d-flex justify-content-center text-light" style="z-index: 90; width: 50px; height: 50px; pointer-events: all; cursor: pointer">
+            <i class="bi bi-chat-dots-fill mx-auto my-auto"></i>
+        </div>
+    </div>
+</div>
+<script>
+var isVisible = true;
+function toggleFloatingVisible()
+{
+    if (!isVisible)
+        {
+            document.getElementById('floating-chat').style.pointerEvents = "all";
+            document.getElementById('floating-chat').style.opacity = 100.0;
+        }
+    else 
+        {
+            document.getElementById('floating-chat').style.pointerEvents = "none";
+            document.getElementById('floating-chat').style.opacity = 0;
+        }
+    isVisible = !isVisible
+    
+}
+
+</script>
+
+
+<div class="position-fixed fixed-bottom end-0 d-flex justify-content-end me-2 mb-4 d-block" style="pointer-events: none; ">
+    <div class="">
+        <div class="col-7 col-md-9 p-0">
+            <style>
+            ::-webkit-scrollbar {
+                width: 0;  /* Remove scrollbar space */
+                background: transparent;  /* Optional: just make scrollbar invisible */
+            }
+            /* Optional: show position indicator in red */
+            ::-webkit-scrollbar-thumb {
+                background: transparent;
+            }
+        </style>
+
+            <div class="container-fluid p-0 rounded-3 overflow-hidden d-flex align-items-end" id="floating-chat"style="z-index: 100; min-width: 300px; min-height: 300px;">
+                <div class="row h-100 d-flex align-items-end">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-header d-flex flex-row align-items-center justify-content-between">
+                                @* @if (Model is Doctor Doctor) *@
+                                @* { *@
+                                @*     <img style="max-height: 35px; max-width: 35px" class="rounded-3 me-2" src="@Doctor.DoctorImage"/> *@
+                                @* } *@
+                                @* @if (Model is Patient patient) *@
+                                @* { *@
+                                @*     <img style="max-height: 35px; max-width: 35px" class="rounded-3 me-2" src="@patient.Image"/> *@
+                                @* } *@
+                                <p class="m-0"><strong>Support Chat</strong> | <span class="text-success">Online</span></p>
+                                <i onmousedown="toggleFloatingVisible()" style="cursor: pointer" class="bi bi-x-lg"></i>
+                            </div>
+                            <div class="card-body">
+                                <div class="chat-box h-100" style="overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none; max-height: 60vh" id="messagesList">
+                                    @* @foreach (var chat in currentChats) *@
+                                    @* { *@
+                                    @*     if (chat.From.Id == currentUser.Id) *@
+                                    @*     { *@
+                                    @*         <div class="d-flex flex-row-reverse bd-highlight mb-3"> *@
+                                    @*             <div class=" bd-highlight border-2 rounded-3 border border-primary p-2"> *@
+                                    @*                 <p class="opacity-50">@currentUser.UserName - @DateTime.Now.ToString("f")</p> *@
+                                    @*                 <p class="m-0 p-0 my-auto ms-2">@chat.Content</p> *@
+                                    @*             </div> *@
+                                    @*         </div> *@
+                                    @*     } *@
+                                    @*     else *@
+                                    @*     { *@
+                                    @*         <div class="d-flex flex-row bd-highlight mb-3"> *@
+                                    @*             <div class=" bd-highlight border-2 rounded-3 border border-primary p-2"> *@
+                                    @*                 <p class="opacity-50">@Model.UserName - @DateTime.Now.ToString("f")</p> *@
+                                    @*                 <p class="m-0 p-0 my-auto ms-2">@chat.Content</p> *@
+                                    @*             </div> *@
+                                    @*         </div> *@
+                                    @*     } *@
+                                    @* } *@
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="input-group mb-3">
+                                    <input id="messageInput" type="text" class="form-control" placeholder="Type your message here...">
+                                    <div class="input-group-append">
+                                        <button id="sendButton" class="btn btn-primary">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="~/js/signalr/dist/browser/signalr.js"></script>
+            <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    
+    connection.start().then(function () {
+        document.getElementById("sendButton").disabled = false;
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+    
+    var targetUser = 'doctors';
+    var currentUser = 'demo';
+    
+    function isEmptyOrSpaces(str){
+        return str === null || str.match(/^ *$/) !== null;
+    }
+
+    connection.on("ReceiveMessage", function (from, user, message) {
+        var msg = message.replace(/&/g, "&").replace(/&/g, ">");
+        var encodedMsg = msg;
+        let messageHtml = null;
+        if (user === currentUser && from === targetUser)
+        messageHtml = `
+<div class="d-flex flex-row-reverse bd-highlight mb-3">
+          <div class=" bd-highlight border-2 rounded-3 border border-primary p-2">
+<p class="opacity-50">${currentUser}</p>
+<p class="m-0 p-0 my-auto ms-2">${encodedMsg}</p>          
+</div>
+        </div>
+        `;
+        else if (from === currentUser && user === targetUser)
+            {
+                 messageHtml = `
+                <div class="d-flex flex-row bd-highlight mb-3">
+                          <div class=" bd-highlight border-2 rounded-3 border border-secondary p-2">
+<p class="opacity-50">${targetUser}</p>
+                <p class="m-0 p-0 my-auto ms-2">${encodedMsg}</p>          
+                </div>
+                        </div>
+                        `;
+            }
+        if (!isEmptyOrSpaces(messageHtml))
+            document.getElementById("messagesList").innerHTML += messageHtml;
+    });
+    
+    document.getElementById("messageInput").onkeyup = function(ev) {
+      if (ev.keyCode == 13)
+          {
+              document.getElementById('sendButton').click()
+          }
+    };
+    
+    const targetUserId = 'doctors';
+    const signedInUserId = 'demo';
+    
+    document.getElementById("sendButton").addEventListener("click", function (event) {
+        var message = document.getElementById("messageInput").value;
+        connection.invoke("SendMessage", targetUserId, currentUser, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+        event.preventDefault();
+    });
+    
+    toggleFloatingVisible();
+</script>
+        </div>
+    </div>
+</div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
