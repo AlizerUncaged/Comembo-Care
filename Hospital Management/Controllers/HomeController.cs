@@ -22,7 +22,7 @@ public class HomeController : Controller
 
     #region Contents
 
-    List<dynamic> servicesData = new List<dynamic>()
+    public static List<dynamic> servicesData = new List<dynamic>()
     {
         new
         {
@@ -79,15 +79,6 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         new
         {
             Price = 250,
-            Image =
-                "https://b2257157.smushcdn.com/2257157/wp-content/uploads/2021/10/1218573_FM_BlogImages_2_102621-1024x512.jpg?lossy=1&strip=1&webp=1",
-            Name = "Neoropsychology",
-            Description =
-                @"Neuropsychology is concerned with relationships between the brain and behavior. Neuropsychologists conduct evaluations to characterize behavioral and cognitive changes resulting from central nervous system disease or injury, like Parkinson's disease or another movement disorder."
-        },
-        new
-        {
-            Price = 250,
             Name = "Ultrasound Pelvic",
             Description =
                 @"Neuropsychology is concerned with relationships between the brain and behavior. Neuropsychologists conduct evaluations to characterize behavioral and cognitive changes resulting from central nervous system disease or injury, like Parkinson's disease or another movement disorder."
@@ -109,6 +100,8 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
     [HttpGet("/tos")]
     public async Task<IActionResult> Tos() => View();
+    [HttpGet("/covid")]
+    public async Task<IActionResult> Covid() => View();
 
 
     [HttpGet("/medicine/view")]
@@ -140,8 +133,15 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
 
     [HttpGet("/doctor-invoice")]
-    public async Task<IActionResult> Invoicing()
+    [HttpGet("/check-invoice/{id}")]
+    public async Task<IActionResult> Invoicing(long? id)
     {
+        if (id is { })
+        {
+            return View(await _dbContext.Appointments.Include(x => x.Doctor)
+                .Include(x => x.Patient).FirstOrDefaultAsync(x => x.AppointmentId == id));
+        }
+
         var currentUser = await _userManager.GetUserAsync(User);
 
         var currentDoctor =
@@ -273,15 +273,37 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         return View();
     }
 
+    [HttpPost("/appointments/add/medicine/{appointmentId}")]
+    public async Task<IActionResult> AddMedicine(int appointmentId, [FromForm] string medicineName,
+        [FromForm] long medicineQuantity)
+    {
+        var appointment = await _dbContext.Appointments.FirstOrDefaultAsync(x => x.AppointmentId == appointmentId);
+
+        var services = appointment
+            .Medicines.Split(",").ToList();
+
+        services.Add(medicineName + ":" + medicineQuantity);
+
+        appointment.Medicines = string.Join(",", services);
+
+        _dbContext.Appointments.Update(appointment);
+
+        await _dbContext.SaveChangesAsync();
+
+        return Redirect("/doctor-invoice");
+    }
+
+
     [HttpPost("/appointments/add/service/{appointmentId}")]
-    public async Task<IActionResult> AddAppointment(int appointmentId, [FromForm] string newservicename,
-        [FromForm] double newserviceamount)
+    public async Task<IActionResult> AddAppointment(int appointmentId, [FromForm] string serviceData,
+        [FromForm] string serviceresult)
     {
         var appointment = await _dbContext.Appointments.FirstOrDefaultAsync(x => x.AppointmentId == appointmentId);
 
         var services = appointment
             .Services.Split(",").ToList();
-        services.Add(newservicename + ":" + newserviceamount);
+
+        services.Add(serviceData + ":" + serviceresult.Replace(":", "<dand>"));
 
         appointment.Services = string.Join(",", services);
 
@@ -289,7 +311,7 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
         await _dbContext.SaveChangesAsync();
 
-        return Redirect("/Doctor-dashboard");
+        return Redirect("/doctor-invoice");
     }
 
     [HttpPost("/appointments/done/{appointmentId}")]
@@ -459,6 +481,7 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         if (!await IsUserValid(User))
         {
             await HttpContext.SignOutAsync();
+            return View();
         }
 
         // Send to dashboards.

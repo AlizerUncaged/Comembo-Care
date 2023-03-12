@@ -38,6 +38,8 @@ namespace Hospital_Management.Models
         /// </summary>
         public string Services { get; set; } = string.Empty;
 
+        public string Medicines { get; set; } = string.Empty;
+
         public string? Note { get; set; }
         
         public bool IsDone { get; set; } = false;

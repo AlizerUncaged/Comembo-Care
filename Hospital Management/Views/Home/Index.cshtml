@@ -7,17 +7,32 @@
 }
 
 <div class="text-center">
-@if (SignInManager.IsSignedIn(User))
-{
-    <h1 class="display-4">Welcome</h1>
-    <div class="d-flex justify-content-center align-items-center align-middle">
-        To go to your admin dashboard to go <a class="btn btn-primary m-2" href="/dashboard">Dashboard</a> to register a Doctor go to <a class="btn btn-primary m-2" href="/register">Register</a>
-    </div>
-}
-else
-{
-    <div class="container-fluid mt-4">
-        <h1>Welcome to Comembo Care!</h1>
-    </div>
-}
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <h1 class="display-4">Welcome</h1>
+        <div class="d-flex justify-content-center align-items-center align-middle">
+            To go to your admin dashboard to go <a class="btn btn-primary m-2" href="/dashboard">Dashboard</a> to register a Doctor go to <a class="btn btn-primary m-2" href="/register">Register</a>
+        </div>
+    }
+    else
+    {
+        <div class="container-fluid mt-4">
+            <div class="container-fluid row">
+                <img src="images/Picture1.jpg" style="max-height: 300px; object-fit: cover"/>
+            </div>
+            <h1>DOH COVID 19 HOTLINE (02)894 COVID OR 1555</h1>
+            <p>
+                Persons who may have interacted with a suspected and/or confirmed COVID
+                -19 patient and experiencing any symptoms are instructed to call the
+                Department of Health (DOH) COVID -19 hotline for referral to a health facility
+                <br/>
+                <br/>
+                Persons with known travel history and mild symptoms, including
+                cough, fever, cold, and sore throat, the DOH is advising them to contact their respective local health office for proper assessment and instruction
+            </p>
+            <h3>COVID-19 Resources</h3>
+            <p>Learn about COVID-19, its symptoms, testing processes, and recommended guidelines for quarantine.</p>
+            <a href="/covid" class="btn btn-primary">Know More</a>
+        </div>
+    }
 </div>

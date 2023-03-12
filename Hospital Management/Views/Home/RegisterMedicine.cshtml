@@ -39,7 +39,7 @@
                 <label for="addresId">Price</label>
             </div>
             <div class="form-floating mb-3">
-                <input value="@Model?.ExpiryDate" type="datetime-local" name="expiry" id="addresId" class="form-control" aria-required="true"/>
+                <input value="@Model?.ExpiryDate.ToString("yyyy-MM-ddTHH:mm:ss")" type="datetime-local" name="expiry" id="addresId" class="form-control" aria-required="true"/>
                 <label for="addresId">Expiry Date</label>
             </div>
             <div class="mb-3">
