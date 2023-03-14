@@ -16,7 +16,7 @@
     }
 
     var patients = await DbContext.Patients.Include(x => x.Appointments).ToListAsync();
-    patients = patients.Where(x => x.UserName.ToLower().Contains(search.ToLower()) && x.Email!=  RoleCreation.PatientEmail).ToList();
+    patients = patients.Where(x => x.UserName.ToLower().Contains(search.ToLower()) ).ToList();
 
 }
 

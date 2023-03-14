@@ -3,7 +3,7 @@
 @{
     var currentUser = await UserManager.GetUserAsync(User);
 }
-<div class="position-fixed fixed-bottom end-0 d-flex flex-row-reverse" style="pointer-events: none">
+<div class="position-fixed fixed-top d-flex justify-content-center start-50 translate-middle-x" style="pointer-events: none">
     <div class="d-flex flex-column" id="notifications">
         @* *@
         @* <div class="alert alert-warning alert-dismissible fade show" role="alert" style="pointer-events: all"> *@
@@ -34,7 +34,7 @@ window.onload = function(e){
              let msg = message.replace(/&/g, "&").replace(/&/g, ">");
              let currentDiv = document.getElementById('notifications');
              currentDiv.innerHTML += `
-             <div class="alert alert-warning alert-dismissible fade show" role="alert" style="pointer-events: all">
+             <div class="alert bg-light alert-dismissible fade show" role="alert" style="pointer-events: all">
                  <i class="bi bi-bell-fill"></i> ${msg}
                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
              </div>
