@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gloock&display=swap" rel="stylesheet">
 </head>
-<body style="overflow-x: hidden" class="bg-grey">
+<body style="overflow-x: hidden" class="bg-grey w-100 container-fluid p-0">
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-grey border-bottom">
         <div class="container-fluid">
@@ -81,14 +81,14 @@
 
 @if (User.IsInRole("Admin"))
 {
-    <div class="container-fluid row p-0">
-        <div class="col-4 col-md-2 container-fluid bg-dark text-white" style="min-height:  100vh">
-            <a href="/" class="d-flex align-items-center m-4 me-md-auto text-white text-decoration-none">
-                <i class="bi bi-pencil-square me-2"></i>
-                <span class="h5">Administrator</span>
-            </a>
+    <div class="container-fluid row w-100 p-0 m-0">
+        <div class="row container-fluid bg-dark text-white">
+            @* <a href="/" class="d-flex align-items-center me-md-auto text-white text-decoration-none"> *@
+            @*     <i class="bi bi-pencil-square"></i> *@
+            @*     <span class="h5">Administrator</span> *@
+            @* </a> *@
 
-            <ul class="nav nav-pills flex-column mb-auto navbar-dark">
+            <ul class="nav nav-pills flex-row mb-auto navbar-dark">
                 <li class="nav-item text-white m-3">
                     <a href="/" class="nav-link text-white"><i class="bi bi-house me-2"></i> Dashboard</a>
                 </li>
@@ -112,24 +112,17 @@
                 @* </li> *@
             </ul>
         </div>
-        <div class="col-8 col-md-10 p-0">
+
+        <div class="container-fluid">
             @RenderBody()
         </div>
     </div>
 }
 else if (User.IsInRole("Doctor"))
 {
-    <div class="container-fluid row p-0">
-        <div class="col-5 col-md-3 container-fluid bg-dark text-white pb-4" style="min-height:  100vh">
-            <a href="/" class="d-flex align-items-center m-4 me-md-auto text-white text-decoration-none">
-                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M14.84,16.26C17.86,16.83 20,18.29 20,20V22H4V20C4,18.29 6.14,16.83 9.16,16.26L12,21L14.84,16.26M8,8H16V10A4,4 0 0,1 12,14A4,4 0 0,1 8,10V8M8,7L8.41,2.9C8.46,2.39 8.89,2 9.41,2H14.6C15.11,2 15.54,2.39 15.59,2.9L16,7H8M12,3H11V4H10V5H11V6H12V5H13V4H12V3Z"/>
-                </svg>
-
-                <span class="h4">Doctor</span>
-            </a>
-
-            <ul class="nav nav-pills flex-column mb-auto navbar-dark">
+    <div class="container-fluid row p-0 m-0">
+        <div class="container-fluid bg-dark text-white pb-4">
+            <ul class="nav nav-pills flex-row mb-auto navbar-dark">
                 <li class="nav-item text-white m-3">
                     <a href="/Doctor-dashboard" class="nav-link text-white"><i class="bi bi-house me-2"></i> Appointments</a>
                 </li>
@@ -150,9 +143,9 @@ else if (User.IsInRole("Doctor"))
                 @* </li> *@
             </ul>
         </div>
-        <div class="col-7 col-md-9 p-0">
-            @RenderBody()
-        </div>
+    </div>
+    <div class="container-fluid">
+        @RenderBody()
     </div>
 }
 else if (User.IsInRole("Patient"))
