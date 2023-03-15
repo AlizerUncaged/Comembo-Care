@@ -28,7 +28,7 @@
 @if (Model is {})
 {
     <form method="post" class="container-fluid m-4" action="/patients/edit" enctype="multipart/form-data">
-        <h4>Invoice Appointment</h4>
+        <h4>Laboratory Results</h4>
         <p>Current active appointment created at @Model.DateCreated, from patient @Model.Patient.FullName with message:</p>
         <div class="container-fluid row">
             <textarea readonly="readonly" class="form-control m-2">@(string.IsNullOrWhiteSpace(Model.Note) ? "<None>" : Model.Note)</textarea>
@@ -219,7 +219,7 @@
             }
         </script>
         <button class="btn btn-primary" type="button" onclick="PrintElem('print')">
-            <i class="bi bi-printer-fill"></i> Show Invoice
+            <i class="bi bi-printer-fill"></i> Show Lab Result
         </button>
     </form>
 

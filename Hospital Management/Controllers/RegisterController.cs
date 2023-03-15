@@ -220,6 +220,13 @@ public class RegisterController : Controller
     {
         if (string.IsNullOrWhiteSpace(guardian))
             guardian = string.Empty;
+        
+        if (!name.Contains(" "))
+            return Redirect($"/registerPatient?error={HttpUtility.UrlEncode("Full name required.")}");
+
+        if (cellphoneNumber.Length != 11)
+            return Redirect($"/registerPatient?error={HttpUtility.UrlEncode("Phone number requires 11 characters.")}");
+
 
         if (await _userManager.FindByEmailAsync(email) is { } user)
         {
@@ -252,7 +259,16 @@ public class RegisterController : Controller
         [FromForm] DateTime? date, [FromForm] string[] concerns, [FromForm] int? id, [FromForm] string? doctorId)
     {
         var currentUser = await _userManager.GetUserAsync(User);
+        
+        TimeSpan startTime =  TimeSpan.Parse($"{8}:00"); 
+        TimeSpan endEnd =  TimeSpan.Parse($"{12 + 5}:00"); 
+        
+        if ((date?.TimeOfDay > startTime) && (date?.TimeOfDay < endEnd))
+        {          return Redirect(
+            $"/registerAppointment?error=You can only register an appointment at 8AM till 5PM");
 
+        }
+        
         var appointments = await _dbContext.Appointments.ToListAsync();
 
         foreach (var appointment in appointments)
