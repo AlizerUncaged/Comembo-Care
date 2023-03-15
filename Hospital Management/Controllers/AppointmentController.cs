@@ -65,7 +65,7 @@ public class AppointmentController : Controller
         _dbContext.Appointments.Update(appointment);
 
         await _dbContext.SaveChangesAsync();
-
-        return Redirect("/Doctor-dashboard");
+        
+        return Redirect($"/doctor/notify/appointment/{appointmentId}");
     }
 }

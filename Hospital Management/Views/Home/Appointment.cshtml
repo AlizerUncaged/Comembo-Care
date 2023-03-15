@@ -1,8 +1,15 @@
 ﻿@model AppointmentModel?
 @inject IHttpContextAccessor HttpContextAccessor
+@inject ApplicationDbContext DbContext
 @using Hospital_Management.Utilities
+@using Hospital_Management.Controllers
+@using Hospital_Management.Data
+@using Microsoft.EntityFrameworkCore
 @{
     ViewData["Title"] = "New Appointment";
+
+    var services = HomeController.servicesData.Select(x => x.Name);
+    var dentists = await DbContext.Doctors.ToListAsync();
 }
 
 @if (HttpContextAccessor.HttpContext!.Request.Query.TryGetValue("error", out var errorString))
@@ -51,18 +58,18 @@ type="text" name="description" class="form-control" autocomplete="off"
 </textarea>
         <label for="desc">Message</label>
     </div>
-    @* *@
-    @* <div class="mb-3"> *@
-    @*     <label class="form-label form-control">Your Concerns</label> *@
-    @*     @foreach (var i in new[] { "braces", "cleaning", "consultation", "crown", "filling", "teeth-whitening", "tooth extraction", "veneers", "x-ray" }) *@
-    @*     { *@
-    @*         <div class="form-check"> *@
-    @*             <input class="form-check-input" type="checkbox" id="@i" name="concerns[]" value="@i"> *@
-    @*             <label class="form-check-label" for="@i">@i.Replace("-", " ").FirstCharToUpper()</label> *@
-    @*             <br> *@
-    @*         </div> *@
-    @*     } *@
-    @* </div> *@
+    
+    <div class="mb-3">
+        <label class="form-label form-control">Services</label>
+        @foreach (var i in services)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="@i" name="concerns[]" value="@i">
+                <label class="form-check-label" for="@i">@i.Replace("-", " ").FirstCharToUpper()</label>
+                <br>
+            </div>
+        }
+    </div>
 
     <button id="registerSubmit" type="submit" class="w-100 m-2 btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-hand-thumbs-up-fill"></i> Submit</button>
     <!-- Modal -->

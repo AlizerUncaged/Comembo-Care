@@ -100,6 +100,7 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
     [HttpGet("/tos")]
     public async Task<IActionResult> Tos() => View();
+
     [HttpGet("/covid")]
     public async Task<IActionResult> Covid() => View();
 
@@ -416,6 +417,20 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         await _hubContext.Clients.All.SendAsync("ReceiveNotification", patientId, notificationText);
         return Redirect("/doctor-patients");
     }
+
+    [HttpGet("/doctor/notify/appointment/{id}")]
+    public async Task<IActionResult> DoctorNotificationPost(long id)
+    {
+        var appointment = await _dbContext.Appointments
+            .Include(x => x.Doctor)
+            .Include(x => x.Patient).FirstOrDefaultAsync(x => x.AppointmentId == id);
+
+        await _hubContext.Clients.All.SendAsync("ReceiveNotification", appointment.Patient.Id,
+            $"Your appointment has been approved by {appointment.Doctor.DoctorName}");
+        return Redirect("/Doctor-dashboard");
+       //  return Redirect("/doctor-patients");
+    }
+
 
     [HttpGet("/patientdashboard")]
     public async Task<IActionResult> Patient()
