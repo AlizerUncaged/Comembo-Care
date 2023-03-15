@@ -1,4 +1,10 @@
-﻿@inject IHttpContextAccessor HttpContextAccessor
+﻿@using Hospital_Management.Data
+@using Hospital_Management.Utilities
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@inject IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "Register Doctor";
     var error = string.Empty;
@@ -6,6 +12,7 @@
     {
         error = errorString.ToString();
     }
+    var services = await DbContext.Services.ToListAsync();
 }
 
 
@@ -68,6 +75,18 @@
             <div class="form-floating mb-3">
                 <input id="passwordd" type="password" name="password" class="form-control" aria-required="true"/>
                 <label for="passwordd">Password</label>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label form-control">Services Offered</label>
+                @foreach (var i in services)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="s-@i.Id" name="concerns[]" value="@i.Id">
+                        <label class="form-check-label" for="s-@i.Id">@i.Name.Replace("-", " ").FirstCharToUpper()</label>
+                        <br>
+                    </div>
+                }
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary"><i class="bi bi-box-arrow-right"></i> Register</button>
         </form>

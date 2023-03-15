@@ -43,6 +43,7 @@
                 <th scope="col">Address</th>
                 <th scope="col">Birthdate</th>
                 <th scope="col">License Number</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -57,6 +58,11 @@
                     <td>@doctor.Address</td>
                     <td>@DateTime.Parse(doctor.Birthdate).ToString("MMMM d, yyyy", new CultureInfo("en-US"))</td>
                     <td>@doctor.LicenseNumber</td>
+                    <td>
+                        <a class="btn btn-success rounded-3 m-1" href="/chat/@doctor.Id">
+                            <i class="bi bi-chat-fill"></i> Chat
+                        </a>
+                    </td>
                 </tr>
             }
             </tbody>

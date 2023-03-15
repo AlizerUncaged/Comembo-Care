@@ -20,72 +20,6 @@ public class HomeController : Controller
     private readonly IWebHostEnvironment _environment;
     private readonly IHubContext<ChatHub> _hubContext;
 
-    #region Contents
-
-    public static List<dynamic> servicesData = new List<dynamic>()
-    {
-        new
-        {
-            Price = 250,
-            Image = "https://upload.wikimedia.org/wikipedia/commons/c/cf/Complete_blood_count_and_differential.jpg",
-            Name = "CBC (Complete Blood Count)",
-            Description =
-                @"A complete blood count, also known as a full blood count, is a set of medical laboratory tests that provide information about the cells in a person's blood. The CBC indicates the counts of white blood cells, red blood cells and platelets, the concentration of hemoglobin, and the hematocrit.
-Fasting blood sugar (FBS) measures blood glucose after you have not eaten for at least 8 hours. It is often the first test done to check for prediabetes and diabetes."
-        },
-        new
-        {
-            Price = 150,
-            Image = "https://labs.selfdecode.com/app/uploads/2019/12/Creatinine-Test-High-Low-Normal-Levels-1.jpg",
-            Name = "CREA (Creatine Test)",
-            Description = @"What is a creatinine test?
-This test measures creatinine levels in blood and/or urine. Creatinine is a waste product made by your muscles as part of regular, everyday activity. Normally, your kidneys filter creatinine from your blood and send it out of the body in your urine. If there is a problem with your kidneys, creatinine can build up in the blood and less will be released in urine. If blood and/or urine creatinine levels are not normal, it can be a sign of kidney disease."
-        },
-        new
-        {
-            Price = 250,
-            Image =
-                "https://bookmerilab.com/tests/wp-content/uploads/2022/05/Liver-damage-such-as-Cirrhosis-and-Fibrosis.-1.png",
-            Name = "SGPT (serum glutamate-pyruvate transaminase)",
-            Description =
-                @"serum glutamate-pyruvate transaminase or serum glutamic-pyruvic transaminase. An enzyme found in the liver and other tissues. A high level of SGPT released into the blood may be a sign of liver damage, cancer, or other diseases."
-        },
-        new
-        {
-            Price = 70,
-            Image =
-                "https://www.news-medical.net/image.axd?picture=2016%2F6%2FUrine_analysis_shutterstock_146356910.jpg",
-            Name = "Urine Test",
-            Description =
-                @"A urinalysis is a test of your urine. It's used to detect and manage a wide range of disorders, such as urinary tract infections, kidney disease and diabetes. A urinalysis involves checking the appearance, concentration and content of urine."
-        },
-        new
-        {
-            Price = 150,
-            Image =
-                "https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2022/05/stool_sample_test_732x549_thumb-732x549.jpg",
-            Name = "Stool Exam",
-            Description =
-                @"A stool test examines a sample of faeces (poo) in the laboratory. There are many different types of stool tests, to check for bowel cancer, gastrointestinal infections and other health conditions."
-        },
-        new
-        {
-            Price = 250,
-            Image = "https://medlineplus.gov/images/Xray_share.jpg",
-            Name = "X-ray",
-            Description =
-                @"A form of high energy electromagnetic radiation that can pass through most objects, including the body. X-rays travel through the body and strike an x-ray detector (such as radiographic film, or a digital x-ray detector) on the other side of the patient, forming an image that represents the “shadows” of objects inside the body."
-        },
-        new
-        {
-            Price = 250,
-            Name = "Ultrasound Pelvic",
-            Description =
-                @"Neuropsychology is concerned with relationships between the brain and behavior. Neuropsychologists conduct evaluations to characterize behavioral and cognitive changes resulting from central nervous system disease or injury, like Parkinson's disease or another movement disorder."
-        },
-    };
-
-    #endregion
 
     public HomeController(ILogger<HomeController> logger, RoleCreation roleCreation, ApplicationDbContext dbContext,
         UserManager<IdentityUser> userManager, IWebHostEnvironment environment, IHubContext<ChatHub> hubContext)
@@ -107,6 +41,10 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
 
     [HttpGet("/medicine/view")]
     public async Task<IActionResult> MedicineList() => View();
+    
+
+    [HttpGet("/services/view")]
+    public async Task<IActionResult> ServiceInventory() => View();
 
 
     [HttpGet("/medicine/update")]
@@ -114,6 +52,14 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
     public async Task<IActionResult> RegisterMedicine(long? id)
     {
         return View(await _dbContext.Medicines.FirstOrDefaultAsync(x => x.Id == id));
+    }
+
+
+    [HttpGet("/services/update")]
+    [HttpGet("/services/update/{id}")]
+    public async Task<IActionResult> RegisterService(long? id)
+    {
+        return View(await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id));
     }
 
 
@@ -360,15 +306,15 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
     [HttpGet("/services/view/{name}")]
     public async Task<IActionResult> ServiceCheck(string name)
     {
-        var data = servicesData.FirstOrDefault(x =>
-            (x.Name as string).Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        var data = await _dbContext.Services.FirstOrDefaultAsync(x =>
+            x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         return View(data);
     }
 
     [HttpGet("/services")]
     public async Task<IActionResult> Services()
     {
-        return View(servicesData);
+        return View(await _dbContext.Services.ToListAsync());
     }
 
     [HttpGet("/registerPatient")]
@@ -428,7 +374,7 @@ This test measures creatinine levels in blood and/or urine. Creatinine is a wast
         await _hubContext.Clients.All.SendAsync("ReceiveNotification", appointment.Patient.Id,
             $"Your appointment has been approved by {appointment.Doctor.DoctorName}");
         return Redirect("/Doctor-dashboard");
-       //  return Redirect("/doctor-patients");
+        //  return Redirect("/doctor-patients");
     }
 
 

@@ -31,7 +31,7 @@ public class RegisterController : Controller
         [FromForm] string address,
         [FromForm] string birthdate, [FromForm] string gender,
         [FromForm] string cellphoneNumber, [FromForm] string licenseNumber, [FromForm] string password,
-        [FromForm] IFormFile? image)
+        [FromForm] IFormFile? image, [FromForm] string[] concerns)
     {
         if (await _userManager.FindByEmailAsync(email) is { } user)
         {
@@ -56,15 +56,22 @@ public class RegisterController : Controller
             DoctorImage = $"/images/doctors/{image.FileName}";
         }
 
-        var Doctor = new Doctor()
+        var doctor = new Doctor()
         {
             Name = name, Address = address, Gender = gender, Birthdate = birthdate, CellphoneNumber = cellphoneNumber,
             LicenseNumber = licenseNumber, UserName = name, DoctorImage = DoctorImage, Email = email
         };
 
-        var newEntity = await _dbContext.Doctors.AddAsync(Doctor);
+        var services = await _dbContext.Services.ToListAsync();
 
-        var registerResult = await _userManager.CreateAsync(Doctor, password);
+        foreach (var concern in concerns)
+        {
+            doctor.AllowedServices.Add(services.FirstOrDefault(x => x.Id == long.Parse(concern)));
+        }
+
+        var newEntity = await _dbContext.Doctors.AddAsync(doctor);
+
+        var registerResult = await _userManager.CreateAsync(doctor, password);
 
         if (!registerResult.Succeeded)
             return Content(registerResult.Errors.FirstOrDefault().Description);
@@ -119,7 +126,7 @@ public class RegisterController : Controller
 
             if (image is { })
                 medicine.Image = medicineImage;
-            
+
             if (expiry is { })
                 medicine.ExpiryDate = expiry.GetValueOrDefault();
 
@@ -143,7 +150,7 @@ public class RegisterController : Controller
 
             if (expiry is { })
                 medicine.ExpiryDate = expiry.GetValueOrDefault();
-            
+
             await _dbContext.Medicines.AddAsync(medicine);
         }
 
@@ -151,6 +158,58 @@ public class RegisterController : Controller
         await _dbContext.SaveChangesAsync();
 
         return RedirectPermanent("/medicine/view");
+    }
+
+    [HttpPost("/registerService")]
+    public async Task<IActionResult> Register(
+        [FromForm] string? name,
+        [FromForm] string? moreInfo,
+        [FromForm] long? id,
+        [FromForm] string? description,
+        [FromForm] double? price
+    )
+    {
+        var medicine = await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (medicine is { }) // update
+        {
+            if (name is { })
+                medicine.Name = name;
+
+            if (description is { })
+                medicine.Description = description;
+
+            if (price is { })
+                medicine.Price = price.Value;
+
+            if (moreInfo is { })
+                medicine.MoreInfo = moreInfo;
+
+            _dbContext.Services.Update(medicine);
+        }
+        else
+        {
+            medicine ??= new Service();
+
+            if (name is { })
+                medicine.Name = name;
+
+            if (description is { })
+                medicine.Description = description;
+
+            if (price is { })
+                medicine.Price = price.Value;
+
+            if (moreInfo is { })
+                medicine.MoreInfo = moreInfo;
+
+            await _dbContext.Services.AddAsync(medicine);
+        }
+
+
+        await _dbContext.SaveChangesAsync();
+
+        return RedirectPermanent("/services/view");
     }
 
     [HttpPost("/registerPatient")]
@@ -190,7 +249,7 @@ public class RegisterController : Controller
 
     [HttpPost("/newAppointment")]
     public async Task<IActionResult> RegisterPatient([FromForm] string description, [FromForm] double paid,
-        [FromForm] DateTime? date, [FromForm] string[] concerns, [FromForm] int? id)
+        [FromForm] DateTime? date, [FromForm] string[] concerns, [FromForm] int? id, [FromForm] string? doctorId)
     {
         var currentUser = await _userManager.GetUserAsync(User);
 
@@ -209,24 +268,30 @@ public class RegisterController : Controller
             }
         }
 
+        var doctor = await _dbContext.Doctors.FirstOrDefaultAsync(x => x.Id == doctorId);
+
         var currentPatient =
             await _dbContext.Patients.FirstOrDefaultAsync(x => x.Id == currentUser.Id);
+        var allServices = await _dbContext.Services.ToListAsync();
 
-        var Doctor = new AppointmentModel()
+        var appointmentModel = new AppointmentModel()
         {
             Note = description, Patient = currentPatient,
-            Services = string.Join(",", concerns),
-            Date = date, TotalPrice = paid
+            Services = string.Join(",",
+                concerns.Select(x => $"{x}:{allServices.FirstOrDefault(y => y.Name == x).Price}:OK")),
+            Date = date,
+            TotalPrice = paid,
+            Doctor = doctor
         };
 
         if (id is { })
         {
-            Doctor.AppointmentId = id;
-            _dbContext.Appointments.Update(Doctor);
+            appointmentModel.AppointmentId = id;
+            _dbContext.Appointments.Update(appointmentModel);
         }
         else
         {
-            Doctor = (await _dbContext.Appointments.AddAsync(Doctor)).Entity;
+            appointmentModel = (await _dbContext.Appointments.AddAsync(appointmentModel)).Entity;
         }
 
         await _dbContext.SaveChangesAsync();
@@ -234,6 +299,6 @@ public class RegisterController : Controller
         if (User.IsInRole("Admin"))
             return Redirect("/admin/appointments");
 
-        return Redirect($"/Invoice?appointmentId={Doctor.AppointmentId}");
+        return Redirect($"/Invoice?appointmentId={appointmentModel.AppointmentId}");
     }
 }

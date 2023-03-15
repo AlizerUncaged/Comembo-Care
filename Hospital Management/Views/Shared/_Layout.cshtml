@@ -1,7 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-
+@{
+    var administrators = await UserManager.GetUsersInRoleAsync("Admin");
+    
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,6 +115,9 @@
                 <li class="nav-item text-white m-3">
                     <a href="/medicine/view" class="nav-link text-white"><i class="bi bi-capsule me-2"></i> Medicine Inventory</a>
                 </li>
+                <li class="nav-item text-white m-3">
+                    <a href="/services/view" class="nav-link text-white"><i class="bi bi-life-preserver"></i> Service Inventory</a>
+                </li>
                 @* <li class="nav-item text-white m-3"> *@
                 @*     <a href="/messages" class="nav-link text-white"><i class="bi bi-chat-dots me-2"></i> Messages</a> *@
                 @* </li> *@
@@ -135,10 +141,10 @@ else if (User.IsInRole("Doctor"))
                     <a href="/doctor-patients" class="nav-link text-white"><i class="bi bi-person-fill-add me-2"></i> Patients</a>
                 </li>
                 <li class="nav-item text-white m-3">
-                    <a href="/doctor-invoice" class="nav-link text-white"><i class="bi bi-people me-2"></i> Invoice</a>
+                    <a href="/doctor-invoice" class="nav-link text-white"><i class="bi bi-people me-2"></i> Results</a>
                 </li>
                 <li class="nav-item text-white m-3">
-                    <a href="/doctor/support" class="nav-link text-white"><i class="bi bi-chat-dots-fill me-2"></i> Support Chat</a>
+                    <a href="/chat/@(administrators.FirstOrDefault()?.Id)" class="nav-link text-white"><i class="bi bi-chat-dots-fill me-2"></i> Administrator Chat</a>
                 </li>
                 @* <li class="nav-item text-white m-3"> *@
                 @*     <a href="/appointment-details" class="nav-link text-white"><i class="bi bi-file-earmark-image-fill me-2"></i> Appointment Details</a> *@

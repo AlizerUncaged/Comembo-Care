@@ -55,7 +55,7 @@
                     <th scope="row">@(patients.IndexOf(patient) + 1)</th>
                     <td>@patient.Name</td>
                     <td>@patient.Address</td>
-                    <td>@DateTime.Parse(patient.Birthdate).ToString("MMMM d, yyyy", new CultureInfo("en-US"))</td>
+                    <td>@patient.Birthdate</td>
                     <td>@patient.Gender</td>
                     <td>@patient.CellphoneNumber</td>
                     <td>@patient.Email</td>

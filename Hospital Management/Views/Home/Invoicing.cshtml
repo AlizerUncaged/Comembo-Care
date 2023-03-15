@@ -21,7 +21,7 @@
         .Where(x => !string.IsNullOrWhiteSpace(x))
         .ToList();
 
-    var servicesData = HomeController.servicesData;
+    var servicesData = await DbContext.Services.ToListAsync();
 }
 
 

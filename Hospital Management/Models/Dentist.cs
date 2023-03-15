@@ -25,5 +25,7 @@ namespace Hospital_Management.Models
         public string? DoctorImage { get; set; }
 
         public List<AppointmentModel> DeclinedAppointments { get; set; } = new();
+
+        public List<Service> AllowedServices { get; set; } = new();
     }
 }

@@ -1,0 +1,70 @@
+﻿@using Hospital_Management.Data
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+
+@{
+    ViewBag.Title = "Services";
+    Layout = "_Layout";
+
+    var search = string.Empty;
+    if (Context.Request.Query.TryGetValue("find", out var find))
+    {
+        search = find.ToString();
+    }
+
+    var services = await DbContext.Services.ToListAsync();
+    if (!string.IsNullOrWhiteSpace(search))
+        services = services.Where(x => x.Name.ToLower().Contains(search.ToLower())).ToList();
+
+    var doctors = await DbContext.Doctors
+        .Include(x => x.AllowedServices)
+        .ToListAsync();
+}
+
+<div class="container-fluid mt-2">
+    <form method="get">
+        <div class="mb-3">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">
+                        <i class="bi bi-search"></i>
+                    </span>
+                </div>
+                <input value="@search" name="find" type="text" class="form-control" placeholder="Service Name" aria-label="Patient" aria-describedby="basic-addon1">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search Services</button>
+                <a href="/services/update" class="btn btn-primary rounded-3"><i class="bi bi-plus-lg"></i> Add Service</a>
+            </div>
+        </div>
+    </form>
+    <div class="container row">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Doctors</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var service in services)
+            {
+                <tr>
+                    <th scope="row">@(services.IndexOf(service) + 1)</th>
+                    <th scope="row">@service.Name</th>
+                    <th scope="row">@service.Description</th>
+                    <th scope="row">@(doctors.Count(x => x.AllowedServices.Contains(service)))</th>
+                    <td>
+                        <a class="btn btn-success rounded-3 m-1" href="/services/update/@service.Id">
+                            <i class="bi bi-pen"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

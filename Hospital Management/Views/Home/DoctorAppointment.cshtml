@@ -95,7 +95,7 @@
                             <td>@appointment.Patient.FullName</td>
                             <td>@appointment.Date?.ToString("hh:mm tt")</td>
                             <td>@appointment.Date?.ToString("MMMM d, yyyy", new CultureInfo("en-US"))</td>
-                            <td>@appointment.Services</td>
+                            <td>@(string.Join(", ", (appointment.Services as string).Split(",").Select(x=>x.Split(":").First())))</td>
                             <td>@status</td>
                             <td>
                                 @if (open)
